@@ -20,23 +20,45 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
-          path: "stations",
-          component: () => import("../pages/Stations.vue"),
+          path: "detailedWeather/:stationId",
+          component: () => import("../pages/StationWeather.vue"),
           meta: { requiresAuth: true },
         },
         {
-          path: "intervals",
-          component: () => import("../pages/Intervals.vue"),
+          path: "api",
+          component: () => import("../pages/API.vue"),
           meta: { requiresAuth: true },
         },
         {
-          path: "dailyforecasts",
-          component: () => import("../pages/DailyForecast.vue"),
+          path: "parameters",
+          component: () => import("../pages/Parameters.vue"),
+
+          meta: { requiresAuth: true },
+        },
+
+        {
+          path: "forecast",
+          component: () => import("../pages/Forecast.vue"),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: "map",
+          component: () => import("../pages/WeatherMap.vue"),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: "weather",
+          component: () => import("../pages/Weather.vue"),
           meta: { requiresAuth: true },
         },
         {
           path: "advisories",
           component: () => import("../pages/Advisories.vue"),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: "about",
+          component: () => import("../pages/AboutNCHMLayout.vue"),
           meta: { requiresAuth: true },
         },
         {

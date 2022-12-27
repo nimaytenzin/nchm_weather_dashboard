@@ -30,28 +30,72 @@ export const TimeRange = [
     value: 6,
   },
   {
-    name: "02:00 AM",
+    name: "07:00 AM",
     value: 7,
   },
   {
-    name: "02:00 AM",
+    name: "08:00 AM",
     value: 8,
   },
   {
-    name: "02:00 AM",
+    name: "09:00 AM",
     value: 9,
   },
   {
-    name: "02:00 AM",
+    name: "10:00 AM",
     value: 10,
   },
   {
-    name: "02:00 AM",
+    name: "11:00 AM",
     value: 11,
   },
 
   {
     name: "12:00 PM",
     value: 12,
+  },
+  {
+    name: "01:00 PM",
+    value: 13,
+  },
+  {
+    name: "02:00 PM",
+    value: 14,
+  },
+  {
+    name: "03:00 PM",
+    value: 15,
+  },
+  {
+    name: "04:00 PM",
+    value: 16,
+  },
+  {
+    name: "05:00 PM",
+    value: 17,
+  },
+  {
+    name: "06:00 PM",
+    value: 18,
+  },
+  {
+    name: "07:00 PM",
+    value: 19,
+  },
+  {
+    name: "08:00 PM",
+    value: 20,
+  },
+  {
+    name: "09:00 PM",
+    value: 21,
+  },
+  {
+    name: "10:00 PM",
+    value: 22,
+  },
+  {
+    name: "11:00 PM",
+    value: 23,
   },
 ];

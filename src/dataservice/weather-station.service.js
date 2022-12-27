@@ -23,3 +23,7 @@ export async function UpdateWeatherStation(id, data) {
     headers: authHeader(),
   });
 }
+
+export async function GetWeatherTodayByStation(stationName) {
+  return await axios.get(`${BackendApi}/station/weather/${stationName}`);
+}
