@@ -1,14 +1,38 @@
 <template>
-  <div class="video-bg">
-    <button @click="login">LOGIN</button>
+  <div class="flex items-center justify-center h-screen">
+    <!-- Login Container -->
+    <div
+      class="min-w-xl flex-col border bg-white px-6 py-14 shadow-md rounded-[4px]"
+      style="width: 20rem"
+    >
+      <div class="mb-8 flex justify-center">
+        <img class="w-24" src="logo.jpeg" alt="" />
+      </div>
+
+      <div class="flex flex-col text-sm rounded-md">
+        <input
+          class="mb-5 rounded-[4px] border p-3 hover:outline-none focus:outline-none hover:border-yellow-500"
+          type="text"
+          v-model="loginPayload.username"
+          placeholder="Username"
+        />
+        <input
+          class="border rounded-[4px] p-3 hover:outline-none focus:outline-none hover:border-yellow-500"
+          type="password"
+          v-model="loginPayload.password"
+          placeholder="Password"
+        />
+      </div>
+      <button
+        class="mt-5 w-full border p-2 bg-gradient-to-r from-primary bg-gray-500 text-white rounded-[4px] hover:bg-slate-400 scale-105 duration-300"
+        @click="login"
+      >
+        Log in
+      </button>
+    </div>
   </div>
 </template>
-<style scoped>
-.wrapper {
-  background: #07c url("../assets/bg.jpeg") center / cover no-repeat fixed;
-  font: 1em/1.618 Nunito, sans-serif;
-}
-</style>
+
 <script>
 import { Login } from "../dataservice/auth.service";
 export default {

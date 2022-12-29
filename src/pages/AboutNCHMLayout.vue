@@ -1,364 +1,75 @@
 <template>
-  <div class="w-full flex justify-center h-full">
+  <div class="w-full flex justify-center h-full overflow-y-scroll">
     <div class="w-11/12 h-full">
       <div class="w-full">
         <div class="w-full bg-white p-6 rounded shadow-lg">
-          <div class="my-6">
-            <h1 class="text-lg font-semibold text-primary-heading1">
-              About NCHM
-            </h1>
-            <p class="text-gray-500">
-              Add and edit weather forecast for specific dates
-            </p>
-          </div>
-          <hr class="w-full my-2" />
+          <div class="w-full">
+            <div>
+              <p class="text-center font-semibold">འཆར་སྣང་དང་དམིགས་གཏད།</p>
+              <p class="text-center font-semibold">Vision & Mission</p>
+              <div class="my-4">
+                <p>Vision: {{ aboutNchm.vision }}</p>
+                <p>Vision Dzongkha: {{ aboutNchm.visionDzo }}</p>
+                <p>Mission: {{ aboutNchm.mission }}</p>
+                <p>Mission Dzongkha: {{ aboutNchm.missionDzo }}</p>
+              </div>
+            </div>
 
-          <div class="flex items-start justify-center w-full gap-4 py-6">
-            <p>Name in english name in dzongkha</p>
-            <p>Vision</p>
-            <p>Mission</p>
-            <p>ABout NCHM Breif</p>
-            <p>Historical TIme line</p>
-            <p>
-              Contact Information
-              <br />
-              Address
-              <br />
-              Website
-              <br />
-              Email
-              <br />
-              Hotline
-              <br />
-              Phone
-            </p>
+            <div>
+              <p class="text-center font-semibold">
+                རྒྱལ་ཡོངས་ཆུ་དཔྱད་དང་གནམ་གཤིས་རིག་པའི་ལྟེ་བའི་སྐོར།
+              </p>
+              <p class="text-center font-semibold">About NCHM</p>
+              <textarea
+                class="w-full"
+                cols="30"
+                rows="10"
+                v-model="aboutNchm.about"
+              ></textarea>
+              <textarea
+                class="w-full"
+                cols="30"
+                rows="10"
+                v-model="aboutNchm.aboutDzo"
+              ></textarea>
+            </div>
+          </div>
+          <div class="w-full"></div>
+
+          <div>
+            <p class="text-center font-semibold">འབྲེལ་བ་འཐབ་ས།</p>
+            <p class="text-center font-semibold">Contact Us</p>
+            <p>Adress: {{ aboutNchm.address }}</p>
+            <p>Contact: {{ aboutNchm.tel }}</p>
+            <p>Website: {{ aboutNchm.website }}</p>
+            <p>tollFree: {{ aboutNchm.tollFree }}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <vue-final-modal
-    v-model="updateIntervalForecastModal"
-    classes="w-full h-full bg-black flex justify-center items-center bg-opacity-20"
-    content-class="bg-white p-6 rounded"
-  >
-    <div style="min-width: 20vw">
-      <p class="my-4 text-gray-600">
-        Hourly/Interval Forecast for {{ selectedStation.name }} |
-        {{ selectedStation.nameDzo }} on {{ new Date(date).toDateString() }}
-      </p>
-
-      <table class="min-w-max w-full table-auto">
-        <thead>
-          <tr class="bg-primary text-white uppercase text-sm leading-normal">
-            <th class="py-3 px-6 text-left">Forecast Interval</th>
-            <th class="py-3 px-6 text-left">Min Temp</th>
-            <th class="py-3 px-6 text-center">Max Temp</th>
-            <th class="py-3 px-6 text-center">Outlook</th>
-          </tr>
-        </thead>
-        <tbody class="text-gray-600 text-sm font-light">
-          <tr
-            v-for="interval in intervalForecastData"
-            :key="interval"
-            class="border-b border-gray-200 hover:bg-gray-100"
-          >
-            <td class="py-3 px-6 text-left whitespace-nowrap">
-              <div class="flex items-center">
-                <span class="font-medium">
-                  {{
-                    parseTime(
-                      interval.startTime
-                        ? interval.startTime
-                        : interval.interval.startTime
-                    )
-                  }}
-                  -
-                  {{
-                    parseTime(
-                      interval.endTime
-                        ? interval.endTime
-                        : interval.interval.endTime
-                    )
-                  }}
-                </span>
-              </div>
-            </td>
-            <td class="py-3 px-6 text-left">
-              <input
-                v-model="interval.minTemp"
-                type="number"
-                class="border border-gray-200 rounded p-1"
-              />
-            </td>
-            <td class="py-3 px-6 text-center">
-              <input
-                v-model="interval.maxTemp"
-                type="number"
-                class="border border-gray-200 rounded p-1"
-              />
-            </td>
-            <td class="py-3 px-6 text-center">
-              <select
-                v-model="interval.outlookId"
-                class="border border-gray-200 rounded p-1"
-              >
-                <option
-                  v-for="outlook in outlooks"
-                  :key="outlook"
-                  :value="outlook.id"
-                >
-                  {{ outlook.name }}
-                </option>
-              </select>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="flex gap-2 my-6">
-        <button
-          @click="updateIntervalForecasts"
-          class="text-destructive-textonDestructive bg-primary px-5 py-2 rounded w-full text-center"
-        >
-          Update
-        </button>
-
-        <button
-          @click="updateIntervalForecastModal = false"
-          class="bg-gray-100 border text-gray-800 px-5 py-2 rounded w-full text-center"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </vue-final-modal>
 </template>
-
 <script>
-import { GetAllWeatherOutlooks } from "../dataservice/outlooks.service.js";
-import { GetAllWeatherStations } from "../dataservice/weather-station.service.js";
-import DailyForecastComponent from "./Forecast/DailyForecast.vue";
-import {
-  CreateDailyForecasts,
-  GetDailyForecastForAllStationsByDate,
-} from "../dataservice/daily-forecast.service";
-
-import {
-  CreateNewIntervalForecast,
-  GetIntervalForecastByDailyForecastId,
-} from "../dataservice/intervalforecast.service";
-
-import { BackendApi, TimeRange } from "../constants.js";
-import { GetAllIntervals } from "../dataservice/interval.service.js";
-
 export default {
-  components: {
-    DailyForecastComponent,
-  },
   data: () => ({
-    weatherStations: [],
-    selectedStation: {},
-    stationsWithForecast: [],
-    outlooks: [],
-    intervals: [],
-    intervalForecastData: [],
-
-    forecastExists: false,
-    date: new Date(),
-    tempDzo: 0,
-    updateIntervalForecastModal: false,
+    aboutNchm: {
+      about: `The National Center for Hydrology and Meteorology (NCHM) is an autonomous scientific and technical organization of the Royal Government of Bhutan responsible for understanding the behaviours of atmosphere, its interaction with cryosphere and water bodies, the weather and climate and distribution of country’s water resources. It is the nodal agency responsible for generation of information and delivery of products and services on weather, climate, cryosphere and water resources in Bhutan. The Centre was established in January 2016 as per the recommendation of the Organization Development (OD) exercises carried out by the Royal Civil Service Commission (RCSC) in August 2014 to provide scientific and technical information and services related to weather, climate, cryosphere, meteorology, hydrology and water resources for line agencies and public, The recommendation for the creation of National Center of hydro-met by reorganizing the erstwhile the Department of Hydro-met Services (DHMS) under the Ministry of Economic Affairs was approval by the Cabinet during its 92nd Lhyengye Zhungtsog (LZ) Meeting held on 11th December 2015. The Center was formally delinked from the Ministry of Economic Affairs vide letter no. MoEA/SEC/HRD/2017/06 dated January 24, 2017 with effect from 1 February 2017.The Center is the designated national focal point of international scientific organization like World Meteorological Organization (WMO) and International Panel for Climate Change (IPCC).`,
+      aboutDzo: `རྒྱལ་ཡོངས་ཆུ་དཔྱད་དང་གནམ་གཤིས་རིག་པའི་ལྟེ་བ་འདི་ འབྲུག་རྒྱལ་གཞུང་གི་དབང་འཛིན་ཅན་གྱི་མཚན་རིག་དང་འཕྲུལ་རིག་ལས་སྡེ་ཅིག་ཨིནམ་དང་ དེ་ལུ་ རླུང་ཁམས་ཀྱི་འགྱུར་གྲོས་གནས་སྟངས་ཧ་གོ་ནི་དང་ དེ་གིས་ འཁྱེག་རོམ་དང་ཆུ་ཕུང་གཅིག་ཁར་ ཕན་ཚུན་འབྲེལ་བ་འཐབ་ཐངས་དང་ གནམ་གཤིས་དང་བསིལ་དྲོད་ དེ་ལས་ རྒྱལ་ཁབ་ཀྱི་ཆུའི་ཐོན་སྐྱེད་ཚུ་ བཀྲམ་སྤེལ་འབད་ནིའི་ལཱ་འགན་ཡོད། འབྲུག་རྒྱལ་ཁབ་ནང་ གནམ་གཤིས་དང་ བསིལ་དྲོད་ འཁྱེག་ཁམས་དང་ ཆུའི་ཐོན་སྐྱེད་འབྲེལ་བའི་ཞབས་ཏོག་དང་ བརྡ་དོན་བཏོན་ནི་ དེ་ལས་ ཐོན་དངོས་སྐྱེལ་སྤྲོད་འབད་ནིའི་འགན་ཁུར་ཡོད་མི་ ལས་སྡེ་ལྟེ་བ་ཅིག་ཨིན། ལྟེ་བ་འདི་ཡང་ སྤྱི་ལོ་ ༢༠༡༤ ལུ་གཞི་བཙུགས་འབད་ཡོདཔ་དང་ དེ་ཡང་ སྤྱི་ལོ་ ༢༠༡༤ ལོར་ རྒྱལ་གཞུང་ཞི་གཡོག་ལྷན་ཚོགས་ཀྱིས་ ལས་སྡེ་གོང་འཕེལ་གྱི་དབྱེ་ཞིབ་ཅིག་འབད་མིའི་རྒྱབ་སྣོན་དང་འཁྲིལ་ཏེ་ འབྲེལ་ཡོད་ལས་སྡེ་དང་ མི་མང་ལུ་ གནམ་གཤིས་དང་ བསིལ་དྲོད་ འཁྱེག་ཁམས་ གནམ་གཤིས་རིག་པ་ ཆུ་དཔྱད་རིག་པ་ དེ་ལས་ ཆུའི་ཐོན་སྐྱེད་འབྲེལ་བའི་ མཚན་རིག་དང་ འཕྲུལ་རིག་བརྡ་དོན་དང་ཞབས་ཏོག་ཚུ་བྱིན་ཐབས་ལུ་དམིགས་ཏེ་གཞི་བཙུགས་འབད་ཡོདཔ་ཨིན་པས། ཧེ་མ བསྟན་རྒྱས་ལྷན་ཁག་འོག་ལུ་ཡོད་པའི་ ཆུ་དཔྱད་དང་གནམ་གཤིས་རིག་པའི་ ལས་ཁུངས་འདི་ ལེགས་འགྱུར་འབད་ཐོག་ལས་ རྒྱལ་ཡོངས་ཆུ་དཔྱད་དང་གནམ་གཤིས་རིག་པའི་ལྟེ་བ་གཞི་བཙུགས་འབད་དགོ་པའི་རྒྱབ་སྣོན་འདི་ སྤྱི་ལོ་ ༢༠༡༥ ཟླ་ ༡༢ པའི་ཚེས་ ༡༡ ལུ་ ལྷན་རྒྱས་གཞུང་ཚོགས་ཀྱི་ཞལ་འཛོམས་ཐེངས་ ༩༢ པའིནང་ཆ་འཇོག་གནང་ནུག། ལྟེ་བ་འདི་ བསྟན་རྒྱས་ལྷན་ཁག་གི་ ཡིག་ཨང་ བསྟན་ལྷན/དྲུང་ཆེན/མི་སྟོབས/༢༠༡༧/༠༦ སྤྱི་ཚེས་ ༢༤/༡/༢༠༡༧ ཅན་མ་དང་འཁྲིལ་ སྤྱི་ལོ་ ༢༠༡༧ ཟླ་ ༢ པའི་ཚེས་ ༡ ལས་ འབྲེལ་ཤོད་འབད་ནུག ལྟེ་བ་འདི་ འཛམ་གླིང་གནམ་གཤིས་རིག་པའི་སྤྱི་ཚོགས་དང་ རྒྱལ་སྤྱི་གནམ་གཤིས་འགྱུར་གྲོས་ཀྱི་གྲོས་ཚོགས་ལུ་ རྒྱལ་ཡོངས་ཀྱི་ལྟེ་གནས་ཨིན།`,
+      vision:
+        "Center of excellence in Hydrology, Meteorology and Cryosphere Science and Services",
+      visionDzo:
+        "ཆུ་དཔྱད་དང་ གནམ་གཤིས་ འཁྱེག་ཁམས་རིག་པ་དང་ཞབས་ཏོག་ནང་ ཁྱད་རིག་ཅན་གྱི་ལྟེ་བ།",
+      mission: `Monitoring and understanding of hydrology, weather, climate and cryosphere, for timely provision of information and services to protect lives and property and support national needs for ecologically balanced sustainable development.`,
+      missionDzo:
+        "ཚེ་སྲོག་དང་ རྒྱུ་ཆ་ཚུ་ཉེན་སྲུང་འབད་ནིའི་དོན་ལས་ དུས་མཐུན་བརྡ་དོན་དང་ཞབས་ཏོག་བྱིན་ནི་དང་ སྐྱེ་ལྡན་གནས་སྟངས་ ཚད་ སྙོམས་དང་ ཡུན་བརྟན་གོང་འཕེལ་གྱི་དོན་ལས་ རྒྱལ་ཡོངས་ཀྱི་དགོས་མཁོ་ཚུ་ལུ་ རྒྱབ་སྐྱོར་འབད་ནིའི་དོན་ལས་ ཆུ་དཔྱད་དང་ གནམ་གཤིས་ བསིལ་དྲོད་ འཁྱེག་ཁམས་གནས་སྟངས་ཧ་གོ་ནི་དང་ ལྟ་རྟོག་འབད་ནི།",
+      website: "https://www.nchm.gov.bt/",
+      tollFree: "1030",
+      tel: "+975 02 33 5578/339673/+975 7745632",
+      address: "S Doebum Lam",
+    },
   }),
-  created() {
-    this.fetchAllStations();
-    this.fetchAllOutlooks();
-    this.fetchAllForecastIntervals();
-    this.fetchWeatherData();
-  },
-  methods: {
-    fetchAllStations() {
-      GetAllWeatherStations().then((res) => {
-        this.weatherStations = res.data;
-        // this.composeForecastPostObject(this.weatherStations);
-      });
-    },
-    fetchAllForecastIntervals() {
-      GetAllIntervals().then((res) => {
-        console.log(res);
-        this.intervals = res.data;
-      });
-    },
-    fetchAllOutlooks() {
-      GetAllWeatherOutlooks().then((res) => {
-        this.outlooks = res.data;
-      });
-    },
-
-    getIconUrl(uri) {
-      return `${BackendApi}/icons/${uri}`;
-    },
-
-    parseTime(value) {
-      let ok;
-      for (let i = 0; i < TimeRange.length; i++) {
-        if (TimeRange[i].value === value) {
-          ok = TimeRange[i].name;
-        }
-      }
-
-      return ok;
-    },
-
-    openUpdateIntervalModal(station) {
-      this.selectedStation = station;
-      this.intervalForecastData = [];
-      // if(this.selectedStation.)
-      // console.log(this.selectedStation.weather.Inte)
-      if (
-        this.selectedStation.weather.IntervalForecasts &&
-        this.selectedStation.weather.IntervalForecasts.length
-      ) {
-        console.log("IntervalForecastExists");
-        this.intervalForecastData =
-          this.selectedStation.weather.IntervalForecasts;
-        console.log(this.intervalForecastData);
-      } else {
-        console.log("IntervalFOrecast DOesnot exist");
-        this.intervals.forEach((interval) => {
-          let data = {
-            startTime: interval.startTime,
-            endTime: interval.endTime,
-            intervalId: interval.id,
-            dailyForecastId: this.selectedStation.weather.id,
-          };
-          this.intervalForecastData.push(data);
-        });
-      }
-      this.updateIntervalForecastModal = true;
-    },
-    updateIntervalForecasts() {
-      console.log(this.intervalForecastData);
-      this.intervalForecastData.forEach((element) => {
-        CreateNewIntervalForecast(element).then((res) => {
-          console.log(res);
-          if (res.status === 201) {
-            this.$toast.show("Updated", {
-              position: "top",
-              type: "success",
-            });
-          }
-        });
-      });
-    },
-
-    fetchWeatherData() {
-      GetDailyForecastForAllStationsByDate(this.formatDate(this.date)).then(
-        (res) => {
-          console.log("Stations with Forecast");
-          console.log(res);
-          this.stationsWithForecast = res.data;
-
-          if (res.data.length !== 0 && res.data) {
-            this.forecastExists = true;
-            this.forecasts = res.data;
-            console.log(this.forecasts);
-          } else {
-            this.forecastExists = false;
-            this.composeForecastPostObject(this.weatherStations);
-          }
-        }
-      );
-    },
-
-    fetchDailyForecasts(date) {
-      GetDailyForecastForAllStationsByDate(date).then((res) => {
-        console.log("Stations with Forecast");
-        console.log(res);
-        this.stationsWithForecast = res.data;
-
-        if (res.data.length !== 0 && res.data) {
-          this.forecastExists = true;
-          this.forecasts = res.data;
-          console.log(this.forecasts);
-        } else {
-          this.forecastExists = false;
-          this.composeForecastPostObject(this.weatherStations);
-        }
-      });
-    },
-
-    updateDailyWeatherForecast() {
-      let data = {
-        date: this.formatDate(this.date),
-        stations: this.stationsWithForecast,
-      };
-      CreateDailyForecasts(data)
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
-      // const data = {
-      //   date: this.date,
-      //   forecasts: this.forecasts,
-      // };
-      // console.log(this.forecasts);
-      // if (this.forecastExists) {
-      //   UpdateailyForecastsByDate(data)
-      //     .then((res) => {
-      //       console.log(res);
-      //       this.$toast.show("Updated!", {
-      //         position: "top",
-      //         type: "success",
-      //       });
-      //     })
-      //     .catch((error) => {
-      //       console.log(error);
-      //     });
-      // } else {
-      //   CreateDailyForecastsByDate(data)
-      //     .then((res) => {
-      //       console.log(res);
-      //     })
-      //     .catch((error) => {
-      //       console.log(error);
-      //     });
-      // }
-    },
-
-    onDayClick(event) {
-      this.forecasts = [];
-      this.forecastExists = false;
-      this.composeForecastPostObject(this.weatherStations);
-      // this.fetchDailyForecasts(event.id);
-    },
-    formatDate(date) {
-      var d = new Date(date),
-        month = "" + (d.getMonth() + 1),
-        day = "" + d.getDate(),
-        year = d.getFullYear();
-
-      if (month.length < 2) month = "0" + month;
-      if (day.length < 2) day = "0" + day;
-
-      return [year, month, day].join("-");
-    },
-    updateIntervalForecast(interval, forecast) {
-      console.log(interval, forecast);
-      CreateIntervalForecast({
-        dailyForecastId: forecast.id,
-        outlookId: 1,
-        minTemp: 12,
-        maxTemp: 33,
-        intervalId: interval.id,
-      }).then((res) => {
-        console.log(res);
-      });
-    },
-  },
+  created() {},
+  methods: {},
 };
 </script>
 

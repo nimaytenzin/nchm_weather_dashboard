@@ -20,7 +20,7 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
-          path: "detailedWeather/:stationId",
+          path: "detailedWeather/:stationName",
           component: () => import("../pages/StationWeather.vue"),
           meta: { requiresAuth: true },
         },

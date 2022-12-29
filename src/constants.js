@@ -2,100 +2,100 @@ export const BackendApi = "http://localhost:3000";
 
 export const TimeRange = [
   {
-    name: "12:00 AM",
+    name: "12am",
     value: 0,
   },
   {
-    name: "01:00 AM",
+    name: "1am",
     value: 1,
   },
   {
-    name: "02:00 AM",
+    name: "2am",
     value: 2,
   },
   {
-    name: "03:00 AM",
+    name: "3am",
     value: 3,
   },
   {
-    name: "04:00 AM",
+    name: "4am",
     value: 4,
   },
   {
-    name: "05:00 AM",
+    name: "5am",
     value: 5,
   },
   {
-    name: "06:00 AM",
+    name: "6am",
     value: 6,
   },
   {
-    name: "07:00 AM",
+    name: "7am",
     value: 7,
   },
   {
-    name: "08:00 AM",
+    name: "8am",
     value: 8,
   },
   {
-    name: "09:00 AM",
+    name: "9am",
     value: 9,
   },
   {
-    name: "10:00 AM",
+    name: "10am",
     value: 10,
   },
   {
-    name: "11:00 AM",
+    name: "11am",
     value: 11,
   },
 
   {
-    name: "12:00 PM",
+    name: "12pm",
     value: 12,
   },
   {
-    name: "01:00 PM",
+    name: "1pm",
     value: 13,
   },
   {
-    name: "02:00 PM",
+    name: "2pm",
     value: 14,
   },
   {
-    name: "03:00 PM",
+    name: "3pm",
     value: 15,
   },
   {
-    name: "04:00 PM",
+    name: "4pm",
     value: 16,
   },
   {
-    name: "05:00 PM",
+    name: "5pm",
     value: 17,
   },
   {
-    name: "06:00 PM",
+    name: "6pm",
     value: 18,
   },
   {
-    name: "07:00 PM",
+    name: "7pm",
     value: 19,
   },
   {
-    name: "08:00 PM",
+    name: "8pm",
     value: 20,
   },
   {
-    name: "09:00 PM",
+    name: "9pm",
     value: 21,
   },
   {
-    name: "10:00 PM",
+    name: "10pm",
     value: 22,
   },
   {
-    name: "11:00 PM",
+    name: "11pm",
     value: 23,
   },
 ];
