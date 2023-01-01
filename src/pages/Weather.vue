@@ -332,6 +332,7 @@ export default {
       this.intervalForecastData = [];
       // if(this.selectedStation.)
       // console.log(this.selectedStation.weather.Inte)
+      console.log(this.selectedStation);
       if (
         this.selectedStation.weather.IntervalForecasts &&
         this.selectedStation.weather.IntervalForecasts.length
@@ -356,9 +357,9 @@ export default {
     },
     updateIntervalForecasts() {
       console.log(this.intervalForecastData);
+      console.log(this.selectedStation);
       this.intervalForecastData.forEach((element) => {
         CreateNewIntervalForecast(element).then((res) => {
-          console.log(res);
           if (res.status === 201) {
             this.$toast.show("Updated", {
               position: "top",
@@ -405,18 +406,6 @@ export default {
       if (day.length < 2) day = "0" + day;
 
       return [year, month, day].join("-");
-    },
-    updateIntervalForecast(interval, forecast) {
-      console.log(interval, forecast);
-      CreateIntervalForecast({
-        dailyForecastId: forecast.id,
-        outlookId: 1,
-        minTemp: 12,
-        maxTemp: 33,
-        intervalId: interval.id,
-      }).then((res) => {
-        console.log(res);
-      });
     },
   },
 };
