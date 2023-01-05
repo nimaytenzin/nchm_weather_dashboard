@@ -2,14 +2,12 @@
   <div class="w-full flex justify-center">
     <div class="w-11/12 flex p-6 gap-6 h-screen overflow-y-scroll">
       <div class="flex flex-col items-center">
-        <div class="">
-          <h1 class="text-lg font-semibold text-primary-heading1">
-            Weather Forecasts
-          </h1>
-          <p class="text-gray-500">
-            Add and edit weather forecast for specific dates
-          </p>
-        </div>
+        <h1 class="text-lg font-semibold text-primary-heading1">
+          Weather Forecasts
+        </h1>
+        <p class="text-gray-500">
+          Add and edit weather forecast for specific dates
+        </p>
         <hr class="w-full my-2" />
         <v-date-picker
           v-model="date"
@@ -40,6 +38,39 @@
 
           Update Weather Data
         </button>
+
+        <div class="flex flex-col items-center">
+          <p class="my-2">Advisory</p>
+          <textarea
+            class="p-2 w-full border rounded"
+            name=""
+            id=""
+            v-model="newAdvisory.message"
+            cols="30"
+            rows="15"
+          ></textarea>
+          <button
+            @click="updateAdvisory()"
+            class="bg-primary flex gap-2 my-2 px-3 py-1 rounded text-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+
+            add/Update Advisory
+          </button>
+        </div>
       </div>
       <div
         class="w-10/12 overflow-x-scroll overflow-y-scroll scrollbar-hide h-full"
@@ -268,6 +299,11 @@ import {
 
 import { BackendApi, TimeRange } from "../constants.js";
 import { GetAllIntervals } from "../dataservice/interval.service.js";
+import {
+  CreateNewWeatherAdvisory,
+  GetWeatherAdvisoryByDate,
+  UpdateWeatherAdvisory,
+} from "../dataservice/weather-advisory.service";
 
 export default {
   components: {
@@ -286,12 +322,15 @@ export default {
     tempDzo: 0,
     updateIntervalForecastModal: false,
     loadingModal: false,
+    newAdvisory: {},
+    advisoryExists: false,
   }),
   created() {
     this.fetchAllStations();
     this.fetchAllOutlooks();
     this.fetchAllForecastIntervals();
     this.fetchWeatherData();
+    this.fetchAdvisory();
   },
   methods: {
     fetchAllStations() {
@@ -312,6 +351,15 @@ export default {
       });
     },
 
+    fetchAdvisory() {
+      GetWeatherAdvisoryByDate(new Date()).then((res) => {
+        if (res.data) {
+          this.advisoryExists = true;
+          this.newAdvisory = res.data;
+        }
+      });
+    },
+
     getIconUrl(uri) {
       return `${BackendApi}/icons/${uri}`;
     },
@@ -327,12 +375,27 @@ export default {
       return ok;
     },
 
+    updateAdvisory() {
+      console.log(this.newAdvisory);
+      if (this.advisoryExists) {
+        UpdateWeatherAdvisory(this.newAdvisory.id, this.newAdvisory).then(
+          (res) => {
+            if (res.status === 200) {
+              console.log("UDPATED", res.data);
+            }
+          }
+        );
+      } else {
+        this.newAdvisory.date = new Date();
+        CreateNewWeatherAdvisory(this.newAdvisory).then((res) => {
+          console.log(res);
+        });
+      }
+    },
+
     openUpdateIntervalModal(station) {
       this.selectedStation = station;
       this.intervalForecastData = [];
-      // if(this.selectedStation.)
-      // console.log(this.selectedStation.weather.Inte)
-      console.log(this.selectedStation);
       if (
         this.selectedStation.weather.IntervalForecasts &&
         this.selectedStation.weather.IntervalForecasts.length
@@ -356,8 +419,6 @@ export default {
       this.updateIntervalForecastModal = true;
     },
     updateIntervalForecasts() {
-      console.log(this.intervalForecastData);
-      console.log(this.selectedStation);
       this.intervalForecastData.forEach((element) => {
         CreateNewIntervalForecast(element).then((res) => {
           if (res.status === 201) {
