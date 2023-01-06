@@ -55,8 +55,7 @@
             v-for="station in stationsWithForecast"
             :key="station"
             @click="showDetailedWeather(station.name)"
-            class="flex w-full justify-center shadow shadow-gray-200 border text-white border-gray-50 rounded-md bg-opacity-30"
-            :class="getWeatherGradient(station.weather.outlook)"
+            class="flex w-full justify-center shadow bg-gray-700 p-4 shadow-gray-200 border text-white border-gray-50 rounded-md bg-opacity-30"
           >
             <div v-if="station.weather" class="">
               <div class="flex items-center justify-center">
