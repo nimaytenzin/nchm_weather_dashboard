@@ -6,7 +6,7 @@
       style="width: 20rem"
     >
       <div class="mb-8 flex justify-center">
-        <img class="w-24" src="logo.jpeg" alt="" />
+        <img class="w-24" src="/logo.jpeg" alt="" />
       </div>
 
       <div class="flex flex-col text-sm rounded-md">
