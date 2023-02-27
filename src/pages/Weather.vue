@@ -40,12 +40,21 @@
         </button>
 
         <div class="flex flex-col items-center">
-          <p class="my-2">Advisory</p>
+          <p class="my-2">Advisory in English</p>
           <textarea
             class="p-2 w-full border rounded"
             name=""
             id=""
             v-model="newAdvisory.message"
+            cols="30"
+            rows="15"
+          ></textarea>
+          <p class="my-2">Advisory in Dzongkha</p>
+          <textarea
+            class="p-2 w-full border rounded"
+            name=""
+            id=""
+            v-model="newAdvisory.messageDzo"
             cols="30"
             rows="15"
           ></textarea>
@@ -456,12 +465,13 @@ export default {
 
     fetchWeatherData() {
       this.loadingModal = true;
+      this.fetchAdvisory();
       GetDailyForecastForAllStationsByDate(this.formatDate(this.date)).then(
         (res) => {
           setTimeout(() => {
             this.loadingModal = false;
           }, 500);
-          this.fetchAdvisory();
+
           this.stationsWithForecast = res.data;
         }
       );

@@ -130,7 +130,7 @@
 
           <span class="">Weather Forecast</span>
         </router-link>
-        <router-link
+        <!-- <router-link
           to="/admin/map/"
           class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
           @click="selectTab('map')"
@@ -156,7 +156,7 @@
           </svg>
 
           <span class="">Weather Map</span>
-        </router-link>
+        </router-link> -->
         <!-- 
         <router-link
           to="/admin/forecast/"
@@ -186,7 +186,7 @@
           <span class="">Forecast </span>
         </router-link> -->
 
-        <router-link
+        <!-- <router-link
           to="/admin/about/"
           class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
           @click="selectTab('about')"
@@ -199,7 +199,7 @@
           <img src="/logotrans.png" class="w-6 h-6" alt="" />
 
           <span class="">About NCHM </span>
-        </router-link>
+        </router-link> -->
       </div>
     </div>
     <div class="flex-1 h-screen overflow-hidden">

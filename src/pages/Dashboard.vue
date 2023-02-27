@@ -1,7 +1,7 @@
 <template>
-  <div class="w-full bg-white flex h-screen flex-col items-center">
-    <div class="w-8/12 overflow-y-scroll scrollbar-hide">
-      <div class="flex justify-between my-6">
+  <div class="w-full bg-gray-100 flex h-screen flex-col items-center">
+    <div class="w-8/12 bg-white overflow-y-scroll scrollbar-hide">
+      <!-- <div class="flex justify-between my-6">
         <div class="flex gap-2 text-gray-500">
           <Switch
             v-model="dzongkhaMode"
@@ -23,98 +23,64 @@
         >
           Download as Image
         </div>
-      </div>
-      <div>
-        <div id="header" class="flex justify-between">
-          <img src="/rgob.jpeg" class="h-32 w-auto" alt="" />
-          <div class="text-3xl font-bold text-center">
-            <p>National center for Hydrology and Meteorology</p>
-            <p>རྒྱལ་ཡོངས་ཆུ་དཔྱད་དང་གནམ་གཤིས་རིག་པའི་ལྟེ་བ།</p>
-            <p class="text-sm font-normal mt-2">
+        <button @click="exportToPDF">Export to PDF</button>
+      </div> -->
+      <div id="element-to-convert" class="p-12">
+        <div id="header" class="flex px-2 justify-between">
+          <img src="/rgob.jpeg" class="h-20 w-auto" alt="" />
+          <div class="text-center">
+            <p class="text-lg font-bold">
+              National center for Hydrology and Meteorology
+            </p>
+            <p class="text-lg font-bold">
+              རྒྱལ་ཡོངས་ཆུ་དཔྱད་དང་གནམ་གཤིས་རིག་པའི་ལྟེ་བ།
+            </p>
+            <p class="font-xs mt-2">
               Center for excellence in Hydrology,Meteorology and Cryosphere
               Science and Services
             </p>
           </div>
-          <img src="/logo.jpeg" class="h-32 w-auto" alt="" />
+          <img src="/logo.jpeg" class="h-20 w-auto" alt="" />
         </div>
         <div id="forecastOverview" class="my-6">
-          <div class="text-xl font-semibold">
-            <p v-if="dzongkhaMode">གནམ་གཤིས་ ༡༥/༡༠/༢༠༢༢</p>
-            <p v-else>
-              Weatherforecast for {{ new Date(date).toDateString() }}
-            </p>
+          <div class="text-xl text-center font-semibold">
+            <p>Weatherforecast for {{ new Date(date).toDateString() }}</p>
           </div>
-          <p>
-            Mostly Cloudy with Light rain over eastern & Central Parts of the
-            country during the next 24 hours.
-          </p>
         </div>
 
-        <div class="mt-6 grid grid-cols-4 gap-2 py-4 overflow-y-scroll">
+        <div class="mt-6 grid grid-cols-5">
           <div
             v-for="station in stationsWithForecast"
             :key="station"
-            @click="showDetailedWeather(station.name)"
-            class="flex w-full justify-center shadow bg-gray-700 p-4 shadow-gray-200 border text-white border-gray-50 rounded-md bg-opacity-30"
+            @click="openViewDetailWeather(station)"
+            class="flex w-full justify-center shadow bg-primary p-4 shadow-gray-200 border text-white border-gray-50 bg-opacity-60"
           >
             <div v-if="station.weather" class="">
               <div class="flex items-center justify-center">
                 <img
-                  class="h-32 w-auto"
+                  class="h-20 w-auto"
                   :src="getIconUrl(station.weather.outlook?.dayIconUri)"
                   alt=""
                 />
               </div>
-              <div class="text-center text-xl font-semibold">
-                <p v-if="dzongkhaMode">
-                  {{ station.nameDzo ? station.nameDzo : station.name }}
-                </p>
-                <p v-else>
+              <div class="text-center text-lg font-semibold">
+                <p>
                   {{ station.name }}
-                </p>
-
-                <p class="text-xs font-normal">
-                  {{ new Date().toDateString() }}
                 </p>
               </div>
               <div id="temps">
-                <div
-                  class="flex items-center gap-1 justify-center text-5xl"
-                  v-if="dzongkhaMode"
-                >
-                  {{ convertToDzongkha(station.weather?.maxTemp?.toString()) }}
-                  <p class="text-2xl font-normal">ºC</p>
-                </div>
-                <p class="text-center my-4 text-2xl" v-else>
+                <p class="text-center text-xl">
                   <span> {{ station.weather?.minTemp }}ºC / </span>
                   <span> {{ station.weather?.maxTemp }} ºC </span>
                 </p>
               </div>
-              <div id="outlooks" class="text-sm mt-1 text-center">
-                <p v-if="dzongkhaMode">
-                  {{ station.weather.outlook?.nameDzo }}
-                </p>
-                <p v-else>
+              <div id="outlooks" class="text-md mt-1 text-center">
+                <p>
                   {{ station.weather.outlook?.name }}
                 </p>
               </div>
             </div>
             <div v-else>
-              <div class="z-20">
-                <p
-                  class="text-3xl font-semibold text-primary"
-                  v-if="dzongkhaMode"
-                >
-                  {{ station.nameDzo ? station.nameDzo : station.name }}
-                </p>
-                <p class="text-3xl font-semibold text-primary" v-else>
-                  {{ station.name }}
-                </p>
-
-                <p class="text-xs">
-                  {{ new Date().toDateString() }}
-                </p>
-              </div>
               <p class="text-critical my-6">Weather Data Not Added</p>
             </div>
           </div>
@@ -127,6 +93,54 @@
         </div>
       </div>
     </div>
+    <vue-final-modal
+      v-model="viewDetailedWeatherModal"
+      classes="w-full h-full bg-black flex  justify-center items-center bg-opacity-20"
+      content-class="bg-white  py-6 px-12  text-white bg-primary rounded"
+    >
+      <h1 class="text-2xl">
+        {{ selectedStation.name }}
+      </h1>
+      <div class="flex items-center justify-center">
+        <img
+          class="h-20 w-auto"
+          :src="getIconUrl(selectedStation?.weather?.outlook?.dayIconUri)"
+          alt=""
+        />
+      </div>
+      <p>
+        {{ selectedStation?.weather?.outlook?.name }}
+      </p>
+      <div
+        id="intervalForecasts"
+        class="flex gap-4 text-white px-2"
+        v-if="selectedStation.weather?.intervalForecast?.length"
+      >
+        <div
+          v-for="forecast in selectedStation.weather?.intervalForecast"
+          :key="forecast"
+          class="py-6 text-center"
+        >
+          <div class="flex justify-center">
+            <img
+              :src="getIconUrl(forecast.outlook?.dayIconUri)"
+              class="w-auto h-16"
+            />
+          </div>
+
+          <div>
+            <p class="text-center font-semibold text-xl">
+              {{ forecast?.minTemp }}ºC
+            </p>
+          </div>
+          <p class="text-xs">
+            {{ parseIntervalTime(forecast.interval?.startTime) }} -
+            {{ parseIntervalTime(forecast.interval?.endTime) }}
+          </p>
+        </div>
+      </div>
+      <div v-else>Interval Data not Added!</div>
+    </vue-final-modal>
   </div>
 </template>
 
@@ -181,7 +195,9 @@ import { toDzongkha } from "../dataservice/dzongkhalang.service";
 import { GetDailyForecastForAllStationsByDate } from "../dataservice/daily-forecast.service";
 import VueJsonPretty from "vue-json-pretty";
 import "vue-json-pretty/lib/styles.css";
-import { BackendApi } from "../constants";
+import { BackendApi, TimeRange } from "../constants";
+import html2pdf from "html2pdf.js";
+
 export default {
   components: {
     Switch,
@@ -192,6 +208,9 @@ export default {
     dzongkhaMode: false,
     stationsWithForecast: [],
     date: new Date(),
+
+    selectedStation: {},
+    viewDetailedWeatherModal: false,
   }),
 
   created() {
@@ -207,6 +226,30 @@ export default {
     },
     getIconUrl(uri) {
       return `${BackendApi}/icons/${uri}`;
+    },
+
+    openViewDetailWeather(station) {
+      this.selectedStation = station;
+      this.viewDetailedWeatherModal = true;
+    },
+
+    exportToPDF() {
+      html2pdf(document.getElementById("element-to-convert"), {
+        margin: 12,
+        filename: "weatherReport.pdf",
+        html2canvas: { scale: 2 },
+      });
+    },
+
+    parseIntervalTime(value) {
+      let ok;
+      for (let i = 0; i < TimeRange.length; i++) {
+        if (TimeRange[i].value === value) {
+          ok = TimeRange[i].name;
+        }
+      }
+
+      return ok;
     },
 
     getWeatherGradient(outlook) {

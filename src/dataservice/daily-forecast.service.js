@@ -32,6 +32,10 @@ export async function ConvertNumbersToDzongkha(number) {
   });
 }
 
+export async function GetWeatherTodayForAll() {
+  return await axios.get(`${BackendApi}/station/allweather`);
+}
+
 export async function UpdateWeatherOutlook(id, data) {
   return await axios.patch(`${BackendApi}/outlook/${id}`, data, {
     headers: {
