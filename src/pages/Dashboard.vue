@@ -53,7 +53,7 @@
             v-for="station in stationsWithForecast"
             :key="station"
             @click="openViewDetailWeather(station)"
-            class="flex w-full justify-center shadow bg-primary p-4 shadow-gray-200 border text-white border-gray-50 bg-opacity-60"
+            class="flex w-full cursor-pointer justify-center shadow bg-primary p-4 shadow-gray-200 border text-white border-gray-50 bg-opacity-60"
           >
             <div v-if="station.weather" class="">
               <div class="flex items-center justify-center">

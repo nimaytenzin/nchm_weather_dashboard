@@ -99,11 +99,18 @@ export default {
     },
 
     fetchWeatherBySelectedStation() {
-      this.requestTitle = "Getting Weather for " + this.selectedStation.name;
+      if (this.selectedStation.name) {
+        this.requestTitle = "Getting Weather for " + this.selectedStation.name;
 
-      GetWeatherTodayByStation(this.selectedStation.name).then((res) => {
-        this.data = res.data;
-      });
+        GetWeatherTodayByStation(this.selectedStation.name).then((res) => {
+          this.data = res.data;
+        });
+      } else {
+        this.$toast.show("Please select a station first", {
+          position: "top",
+          type: "error",
+        });
+      }
     },
 
     fetchAllWeather() {
