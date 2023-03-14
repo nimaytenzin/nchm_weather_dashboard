@@ -1,4 +1,5 @@
-export const BackendApi = "http://localhost:3000";
+// export const BackendApi = "http://localhost:3000";
+export const BackendApi = "https://nchm.ddnsfree.com/api";
 
 export const TimeRange = [
   {

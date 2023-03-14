@@ -1,9 +1,7 @@
 <template>
   <div class="p-6">
     <div class="my-6 flex justify-between">
-      <h1 class="text-lg font-semibold text-primary-heading1">
-        Forecast Intervals
-      </h1>
+      <h1 class="text-lg font-semibold text-primary-heading1">Forecast Intervals</h1>
       <button
         class="bg-primary flex gap-2 px-3 py-1 rounded text-primary-textOnPrimary"
         @click="openAddIntervalModal"
@@ -22,7 +20,6 @@
             d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-
         New Weather Forecast Interval
       </button>
     </div>
@@ -39,13 +36,8 @@
           @dblclick="openEditIntervalModal(interval)"
         >
           <div class="flex flex-col items-center">
-            <p class="font-semibold text-primary-hovered">
-              {{ parseTime(interval.startTime) }}
-            </p>
-            -
-            <p class="font-semibold text-primary-hovered">
-              {{ parseTime(interval.endTime) }}
-            </p>
+            <p class="font-semibold text-primary-hovered">{{ parseTime(interval.startTime) }}</p>-
+            <p class="font-semibold text-primary-hovered">{{ parseTime(interval.endTime) }}</p>
           </div>
 
           <hr class="my-2" />
@@ -79,50 +71,44 @@
     classes="w-full h-full bg-black flex justify-center items-center bg-opacity-20"
     content-class="bg-white  py-6 px-12 rounded"
   >
+    <section>
+      <input type="file" @change="onChange" />
+      <xlsx-read :file="file">
+        <xlsx-json :sheet="selectedSheet">
+          <template #default="{collection}">
+            <div>{{ collection }}</div>
+          </template>
+        </xlsx-json>
+      </xlsx-read>
+    </section>
     <div class="my-4" style="min-width: 20vw">
-      <h1 class="text-primary-heading1 font-semibold">
-        Add New Forecast Interval
-      </h1>
+      <h1 class="text-primary-heading1 font-semibold">Add New Forecast Interval</h1>
       <div>
         <div class="my-4">
-          <label
-            class="block mb-2 text-sm text-primary-label dark:text-gray-300"
-          >
-            Start Time
-          </label>
+          <label class="block mb-2 text-sm text-primary-label dark:text-gray-300">Start Time</label>
           <select
             v-model="newInterval.startTime"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded w-full p-2.5"
             required
           >
-            <option v-for="time in timeOptions" :key="time" :value="time.value">
-              {{ time.name }}
-            </option>
+            <option v-for="time in timeOptions" :key="time" :value="time.value">{{ time.name }}</option>
           </select>
         </div>
         <div class="my-4">
-          <label
-            class="block mb-2 text-sm text-primary-label dark:text-gray-300"
-          >
-            End Time
-          </label>
+          <label class="block mb-2 text-sm text-primary-label dark:text-gray-300">End Time</label>
           <select
             v-model="newInterval.endTime"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded w-full p-2.5"
             required
           >
-            <option v-for="time in timeOptions" :key="time" :value="time.value">
-              {{ time.name }}
-            </option>
+            <option v-for="time in timeOptions" :key="time" :value="time.value">{{ time.name }}</option>
           </select>
         </div>
 
         <button
           @click="createNewInterval"
           class="text-primary-textOnPrimary bg-primary hover:bg-primary-hovered px-5 py-2 rounded w-full text-center"
-        >
-          Add
-        </button>
+        >Add</button>
       </div>
     </div>
   </vue-final-modal>
@@ -134,9 +120,7 @@
   >
     <h1 class="modal-content__title">Delete Interval?</h1>
     <hr class="modal-content__hr" />
-    <div class="modal-content__subtitle">
-      Interval Name:{{ selectedInterval.name }}
-    </div>
+    <div class="modal-content__subtitle">Interval Name:{{ selectedInterval.name }}</div>
 
     <div class="modal-content__actions">
       <button class="btn btn--critical" @click="deleteInterval">Delete?</button>
@@ -149,49 +133,33 @@
     content-class="bg-white  py-6 px-12 rounded"
   >
     <div class="my-4" style="min-width: 20vw">
-      <h1 class="text-primary-heading1 font-semibold">
-        Edit Forecast Interval
-      </h1>
+      <h1 class="text-primary-heading1 font-semibold">Edit Forecast Interval</h1>
       <div>
         <div class="my-4">
-          <label
-            class="block mb-2 text-sm text-primary-label dark:text-gray-300"
-          >
-            Start Time
-          </label>
+          <label class="block mb-2 text-sm text-primary-label dark:text-gray-300">Start Time</label>
           <select
             v-model="selectedInterval.startTime"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded w-full p-2.5"
             required
           >
-            <option v-for="time in timeOptions" :key="time" :value="time.value">
-              {{ time.name }}
-            </option>
+            <option v-for="time in timeOptions" :key="time" :value="time.value">{{ time.name }}</option>
           </select>
         </div>
         <div class="my-4">
-          <label
-            class="block mb-2 text-sm text-primary-label dark:text-gray-300"
-          >
-            End Time
-          </label>
+          <label class="block mb-2 text-sm text-primary-label dark:text-gray-300">End Time</label>
           <select
             v-model="selectedInterval.endTime"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded w-full p-2.5"
             required
           >
-            <option v-for="time in timeOptions" :key="time" :value="time.value">
-              {{ time.name }}
-            </option>
+            <option v-for="time in timeOptions" :key="time" :value="time.value">{{ time.name }}</option>
           </select>
         </div>
 
         <button
           @click="createNewInterval"
           class="text-primary-textOnPrimary bg-primary hover:bg-primary-hovered px-5 py-2 rounded w-full text-center"
-        >
-          Add
-        </button>
+        >Add</button>
       </div>
     </div>
   </vue-final-modal>
@@ -202,11 +170,14 @@ import {
   CreateNewInterval,
   GetAllIntervals,
   Deleteinterval,
-  Updateinterval,
+  Updateinterval
 } from "../dataservice/interval.service.js";
 
 import CustomDropdown from "../components/custom-dropdown.vue";
 import { TimeRange } from "../constants";
+// import { XlsxRead, XlsxTable, XlsxSheets, XlsxJson, XlsxWorkbook, XlsxSheet, XlsxDownload } from "../../dist/vue-xlsx.es.js"
+import { XlsxRead} from 'vue-xlsx';
+
 export default {
   components: { CustomDropdown },
   data: () => ({
@@ -222,7 +193,7 @@ export default {
     editIntervalModal: false,
     selectedInterval: {},
     editIntervalModal: false,
-    deleteIntervalModal: false,
+    deleteIntervalModal: false
   }),
   created() {
     this.fetchAllIntervals();
@@ -230,7 +201,7 @@ export default {
 
   methods: {
     fetchAllIntervals() {
-      GetAllIntervals().then((res) => {
+      GetAllIntervals().then(res => {
         this.intervals = res.data;
       });
     },
@@ -257,52 +228,52 @@ export default {
       ) {
         this.$toast.show("Please Enter All the required Details", {
           position: "top",
-          type: "error",
+          type: "error"
         });
         return;
       }
       CreateNewInterval(this.newInterval)
-        .then((res) => {
+        .then(res => {
           if (res.status === 201) {
             this.$toast.show(`New Station: ${this.newInterval.name} Added`, {
               position: "top",
               useDefaultCss: true,
-              type: "success",
+              type: "success"
             });
             this.addIntervalModal = false;
             this.fetchAllIntervals();
             this.newInterval = {};
           }
         })
-        .catch((error) => {
+        .catch(error => {
           this.$toast.show(
             `Failed to add station: ${this.newStation.name}, Error:${error.message}`,
             {
               position: "top",
               useDefaultCss: true,
-              type: "error",
+              type: "error"
             }
           );
         });
     },
     updateInterval() {
       Updateinterval(this.selectedInterval.id, this.selectedInterval)
-        .then((res) => {
+        .then(res => {
           if (res.status === 200) {
             this.$toast.show(`Updated Station Details`, {
               position: "top",
               useDefaultCss: true,
-              type: "success",
+              type: "success"
             });
             this.fetchAllIntervals();
             this.editIntervalModal = false;
           }
         })
-        .catch((error) => {
+        .catch(error => {
           this.$toast.show(`Opps! Error:${error.message}`, {
             position: "top",
             useDefaultCss: true,
-            type: "error",
+            type: "error"
           });
         });
     },
@@ -317,26 +288,26 @@ export default {
     },
     deleteInterval() {
       Deleteinterval(this.selectedInterval.id)
-        .then((res) => {
+        .then(res => {
           if (res.status === 200) {
             this.$toast.show(`Deleted!`, {
               position: "top",
               useDefaultCss: true,
-              type: "success",
+              type: "success"
             });
             this.fetchAllIntervals();
             this.deleteIntervalModal = false;
           }
         })
-        .catch((error) => {
+        .catch(error => {
           this.$toast.show(`Opps! Error:${error.message}`, {
             position: "top",
             useDefaultCss: true,
-            type: "error",
+            type: "error"
           });
         });
-    },
-  },
+    }
+  }
 };
 </script>
 

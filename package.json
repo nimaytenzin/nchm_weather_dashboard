@@ -21,7 +21,8 @@
     "vue-file-selector": "^2.0.2",
     "vue-final-modal": "^3.4.11",
     "vue-json-pretty": "^2.2.3",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.1.6",
+    "vue-xlsx": "^0.2.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",

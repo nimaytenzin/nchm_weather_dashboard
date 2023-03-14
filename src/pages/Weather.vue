@@ -71,7 +71,7 @@
                   </span>
                 </div>
                 <div
-                  v-if="station.weather?.IntervalForecasts?.length"
+                  v-if="station.weather?.intervalForecast?.length"
                   class="flex text-green-600 text-sm items-center cursor-pointer hover:underline"
                   @click="openUpdateIntervalModal(station)"
                 >
@@ -433,12 +433,12 @@ export default {
       this.selectedStation = station;
       this.intervalForecastData = [];
       if (
-        this.selectedStation.weather.IntervalForecasts &&
-        this.selectedStation.weather.IntervalForecasts.length
+        this.selectedStation.weather.intervalForecast &&
+        this.selectedStation.weather.intervalForecast.length
       ) {
         console.log("IntervalForecastExists");
         this.intervalForecastData =
-          this.selectedStation.weather.IntervalForecasts;
+          this.selectedStation.weather.intervalForecast;
         console.log(this.intervalForecastData);
       } else {
         console.log("IntervalFOrecast DOesnot exist");
@@ -475,7 +475,6 @@ export default {
           setTimeout(() => {
             this.loadingModal = false;
           }, 500);
-
           this.stationsWithForecast = res.data;
         }
       );
