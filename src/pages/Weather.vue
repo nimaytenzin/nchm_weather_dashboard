@@ -2,19 +2,10 @@
   <div class="w-full flex justify-center">
     <div class="w-11/12 flex p-6 gap-6 h-screen overflow-y-scroll">
       <div class="flex flex-col items-center">
-        <h1 class="text-lg font-semibold text-primary-heading1">
-          Weather Forecasts
-        </h1>
-        <p class="text-gray-500">
-          Add and edit weather forecast for specific dates
-        </p>
+        <h1 class="text-lg font-semibold text-primary-heading1">Weather Forecasts</h1>
+        <p class="text-gray-500">Add and edit weather forecast for specific dates</p>
         <hr class="w-full my-2" />
-        <v-date-picker
-          v-model="date"
-          color="teal"
-          @dayclick="fetchWeatherData"
-          class="my-2"
-        />
+        <v-date-picker v-model="date" color="teal" @dayclick="fetchWeatherData" class="my-2" />
         <p>Click on a Date to Fetch Weather Data</p>
 
         <button
@@ -35,20 +26,35 @@
               d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
             />
           </svg>
-
           Update Weather Data
         </button>
 
         <button
           @click="openAddAdvisoryModal"
           class="bg-primary flex gap-2 my-2 px-3 py-1 rounded text-white"
-        >
-          Add Advisory
-        </button>
+        >Add Advisory</button>
       </div>
-      <div
-        class="w-10/12 overflow-x-scroll overflow-y-scroll scrollbar-hide h-full"
-      >
+      <div class="w-10/12 overflow-x-scroll overflow-y-scroll scrollbar-hide h-full">
+        <button @click="uploadData" class="bg-primary flex gap-2 my-2 px-3 py-1 rounded text-white"
+        v-if="selectedSheet">Upload Data: {{selectedSheet}}</button>
+        <input type="file" @change="onChange" />
+        <xlsx-read :file="file">
+          <xlsx-sheets>
+            <template #default="{sheets}">
+              <select v-model="selectedSheet">
+                <option v-for="sheet in sheets" :key="sheet" :value="sheet">
+                  {{ sheet }}
+                </option>
+              </select>
+            </template>
+          </xlsx-sheets>
+          <xlsx-table :sheet="selectedSheet" />
+          <xlsx-json v-show="false" :sheet="selectedSheet" @parsed="onParsed">
+            <template #default="{collection}">
+              <div>{{ collection }}</div>
+            </template>
+          </xlsx-json>
+        </xlsx-read>
         <table class="min-w-max w-full">
           <thead>
             <tr class="bg-primary text-white uppercase text-sm leading-normal">
@@ -66,9 +72,7 @@
             >
               <td class="p-3 text-left whitespace-nowrap">
                 <div class="flex items-center">
-                  <span class="font-medium">
-                    {{ station.name }}
-                  </span>
+                  <span class="font-medium">{{ station.name }}</span>
                 </div>
                 <div
                   v-if="station.weather?.intervalForecast?.length"
@@ -110,7 +114,6 @@
                       d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-
                   IntervalForecast
                 </div>
               </td>
@@ -137,9 +140,7 @@
                     v-for="outlook in outlooks"
                     :key="outlook"
                     :value="outlook.id"
-                  >
-                    {{ outlook.name }}
-                  </option>
+                  >{{ outlook.name }}</option>
                 </select>
               </td>
             </tr>
@@ -179,19 +180,19 @@
               <div class="flex items-center">
                 <span class="font-medium">
                   {{
-                    parseTime(
-                      interval.startTime
-                        ? interval.startTime
-                        : interval.interval.startTime
-                    )
+                  parseTime(
+                  interval.startTime
+                  ? interval.startTime
+                  : interval.interval.startTime
+                  )
                   }}
                   -
                   {{
-                    parseTime(
-                      interval.endTime
-                        ? interval.endTime
-                        : interval.interval.endTime
-                    )
+                  parseTime(
+                  interval.endTime
+                  ? interval.endTime
+                  : interval.interval.endTime
+                  )
                   }}
                 </span>
               </div>
@@ -211,17 +212,12 @@
               />
             </td>
             <td class="p-3 text-center">
-              <select
-                v-model="interval.outlookId"
-                class="border border-gray-200 rounded p-1"
-              >
+              <select v-model="interval.outlookId" class="border border-gray-200 rounded p-1">
                 <option
                   v-for="outlook in outlooks"
                   :key="outlook"
                   :value="outlook.id"
-                >
-                  {{ outlook.name }}
-                </option>
+                >{{ outlook.name }}</option>
               </select>
             </td>
           </tr>
@@ -232,16 +228,12 @@
         <button
           @click="updateIntervalForecasts"
           class="text-destructive-textonDestructive bg-primary px-5 py-2 rounded w-full text-center"
-        >
-          Update
-        </button>
+        >Update</button>
 
         <button
           @click="updateIntervalForecastModal = false"
           class="bg-gray-100 border text-gray-800 px-5 py-2 rounded w-full text-center"
-        >
-          Cancel
-        </button>
+        >Cancel</button>
       </div>
     </div>
   </vue-final-modal>
@@ -266,8 +258,8 @@
         <p class="my-2">Advisory in English</p>
         <textarea
           class="p-2 w-full border rounded"
-          name=""
-          id=""
+          name
+          id
           v-model="newAdvisory.message"
           cols="40"
           rows="5"
@@ -275,8 +267,8 @@
         <p class="my-2">Advisory in Dzongkha</p>
         <textarea
           class="p-2 w-full border rounded"
-          name=""
-          id=""
+          name
+          id
           v-model="newAdvisory.messageDzo"
           cols="50"
           rows="5"
@@ -285,9 +277,7 @@
           <button
             @click="updateAdvisory()"
             class="bg-primary flex gap-2 my-2 px-3 py-1 rounded text-white"
-          >
-            Add Advisory
-          </button>
+          >Add Advisory</button>
           <button
             @click="deleteAdvisory()"
             class="bg-critical flex gap-2 my-2 px-3 py-1 rounded text-white"
@@ -306,7 +296,6 @@
                 d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
               />
             </svg>
-
             Delete
           </button>
         </div>
@@ -321,12 +310,12 @@ import { GetAllWeatherStations } from "../dataservice/weather-station.service.js
 import DailyForecastComponent from "./Forecast/DailyForecast.vue";
 import {
   CreateDailyForecasts,
-  GetDailyForecastForAllStationsByDate,
+  GetDailyForecastForAllStationsByDate
 } from "../dataservice/daily-forecast.service";
 
 import {
   CreateNewIntervalForecast,
-  GetIntervalForecastByDailyForecastId,
+  GetIntervalForecastByDailyForecastId
 } from "../dataservice/intervalforecast.service";
 
 import { BackendApi, TimeRange } from "../constants.js";
@@ -334,12 +323,31 @@ import { GetAllIntervals } from "../dataservice/interval.service.js";
 import {
   CreateNewWeatherAdvisory,
   GetWeatherAdvisoryByDate,
-  UpdateWeatherAdvisory,
+  UpdateWeatherAdvisory
 } from "../dataservice/weather-advisory.service";
+
+import {
+  XlsxRead,
+  XlsxTable,
+  XlsxSheets,
+  XlsxJson,
+  XlsxWorkbook,
+  XlsxSheet,
+  XlsxDownload
+} from "vue3-xlsx";
+
+import * as XLSX from 'xlsx';
 
 export default {
   components: {
     DailyForecastComponent,
+    XlsxRead,
+    XlsxTable,
+    XlsxSheets,
+    XlsxJson,
+    XlsxWorkbook,
+    XlsxSheet,
+    XlsxDownload
   },
   data: () => ({
     weatherStations: [],
@@ -349,6 +357,14 @@ export default {
     intervals: [],
     intervalForecastData: [],
 
+
+    selectedDaySheet:null,
+    file:null,
+    selectedSheet: null,
+    sheetName: null,
+    sheets: [{ name: "SheetOne", data: [{ c: 2 }] }],
+    collection: [{ a: 1, b: 2 }],
+
     forecastExists: false,
     date: new Date(),
     tempDzo: 0,
@@ -356,7 +372,7 @@ export default {
     addAdvisoryModal: false,
     loadingModal: false,
     newAdvisory: {},
-    advisoryExists: false,
+    advisoryExists: false
   }),
   created() {
     this.fetchAllStations();
@@ -366,20 +382,48 @@ export default {
     this.fetchAdvisory();
   },
   methods: {
+    onChange(event){
+       this.file = event.target.files ? event.target.files[0] : null;
+    },
+
+    generate
+
+    uploadData(){
+      for(var i = 0;i < this.selectedDaySheet.length; i++){
+        // let data =  {
+        //   station:
+        // }
+      }
+    },
+    onParsed(event){
+      console.log("on parsed");
+      console.log(event);
+      this.selectedDaySheet = event
+      console.log(event[1].Station)
+      console.log(event[1].Date)
+      console.log(event[2].Station)
+      console.log(event[2].Date)
+      console.log(event[1].Int_4am_10am)
+      console.log(event[1].__EMPTY)
+      console.log(event[1].__EMPTY_1)
+      console.log(event[1].__EMPTY_2)
+      console.log(event[1].__EMPTY_3)
+      // console.log(event[1])
+    },
     fetchAllStations() {
-      GetAllWeatherStations().then((res) => {
+      GetAllWeatherStations().then(res => {
         this.weatherStations = res.data;
         // this.composeForecastPostObject(this.weatherStations);
       });
     },
     fetchAllForecastIntervals() {
-      GetAllIntervals().then((res) => {
+      GetAllIntervals().then(res => {
         console.log(res);
         this.intervals = res.data;
       });
     },
     fetchAllOutlooks() {
-      GetAllWeatherOutlooks().then((res) => {
+      GetAllWeatherOutlooks().then(res => {
         this.outlooks = res.data;
       });
     },
@@ -388,7 +432,7 @@ export default {
       this.addAdvisoryModal = true;
     },
     fetchAdvisory() {
-      GetWeatherAdvisoryByDate(this.date).then((res) => {
+      GetWeatherAdvisoryByDate(this.date).then(res => {
         if (res.data) {
           this.advisoryExists = true;
           this.newAdvisory = res.data;
@@ -415,7 +459,7 @@ export default {
       console.log(this.newAdvisory);
       if (this.advisoryExists) {
         UpdateWeatherAdvisory(this.newAdvisory.id, this.newAdvisory).then(
-          (res) => {
+          res => {
             if (res.status === 200) {
               console.log("UDPATED", res.data);
             }
@@ -423,7 +467,7 @@ export default {
         );
       } else {
         this.newAdvisory.date = new Date();
-        CreateNewWeatherAdvisory(this.newAdvisory).then((res) => {
+        CreateNewWeatherAdvisory(this.newAdvisory).then(res => {
           console.log(res);
         });
       }
@@ -437,17 +481,16 @@ export default {
         this.selectedStation.weather.intervalForecast.length
       ) {
         console.log("IntervalForecastExists");
-        this.intervalForecastData =
-          this.selectedStation.weather.intervalForecast;
+        this.intervalForecastData = this.selectedStation.weather.intervalForecast;
         console.log(this.intervalForecastData);
       } else {
         console.log("IntervalFOrecast DOesnot exist");
-        this.intervals.forEach((interval) => {
+        this.intervals.forEach(interval => {
           let data = {
             startTime: interval.startTime,
             endTime: interval.endTime,
             intervalId: interval.id,
-            dailyForecastId: this.selectedStation.weather.id,
+            dailyForecastId: this.selectedStation.weather.id
           };
           this.intervalForecastData.push(data);
         });
@@ -455,12 +498,12 @@ export default {
       this.updateIntervalForecastModal = true;
     },
     updateIntervalForecasts() {
-      this.intervalForecastData.forEach((element) => {
-        CreateNewIntervalForecast(element).then((res) => {
+      this.intervalForecastData.forEach(element => {
+        CreateNewIntervalForecast(element).then(res => {
           if (res.status === 201) {
             this.$toast.show("Updated", {
               position: "top",
-              type: "success",
+              type: "success"
             });
           }
         });
@@ -471,7 +514,7 @@ export default {
       this.loadingModal = true;
       this.fetchAdvisory();
       GetDailyForecastForAllStationsByDate(this.formatDate(this.date)).then(
-        (res) => {
+        res => {
           setTimeout(() => {
             this.loadingModal = false;
           }, 500);
@@ -483,13 +526,13 @@ export default {
     updateDailyWeatherForecast() {
       let data = {
         date: this.formatDate(this.date),
-        stations: this.stationsWithForecast,
+        stations: this.stationsWithForecast
       };
       CreateDailyForecasts(data)
-        .then((res) => {
+        .then(res => {
           console.log(res);
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -504,8 +547,8 @@ export default {
       if (day.length < 2) day = "0" + day;
 
       return [year, month, day].join("-");
-    },
-  },
+    }
+  }
 };
 </script>
 

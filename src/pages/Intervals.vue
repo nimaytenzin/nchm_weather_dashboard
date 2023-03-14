@@ -71,16 +71,6 @@
     classes="w-full h-full bg-black flex justify-center items-center bg-opacity-20"
     content-class="bg-white  py-6 px-12 rounded"
   >
-    <section>
-      <input type="file" @change="onChange" />
-      <xlsx-read :file="file">
-        <xlsx-json :sheet="selectedSheet">
-          <template #default="{collection}">
-            <div>{{ collection }}</div>
-          </template>
-        </xlsx-json>
-      </xlsx-read>
-    </section>
     <div class="my-4" style="min-width: 20vw">
       <h1 class="text-primary-heading1 font-semibold">Add New Forecast Interval</h1>
       <div>
@@ -175,8 +165,6 @@ import {
 
 import CustomDropdown from "../components/custom-dropdown.vue";
 import { TimeRange } from "../constants";
-// import { XlsxRead, XlsxTable, XlsxSheets, XlsxJson, XlsxWorkbook, XlsxSheet, XlsxDownload } from "../../dist/vue-xlsx.es.js"
-import { XlsxRead} from 'vue-xlsx';
 
 export default {
   components: { CustomDropdown },
