@@ -1,5 +1,7 @@
 // export const BackendApi = "http://localhost:3000";
-export const BackendApi = "https://nchm.ddnsfree.com/api";
+// export const BackendApi = "https://nchm.ddnsfree.com/api";
+export const BackendApi = import.meta.env.VITE_API_ENDPOINT;
+
 
 export const TimeRange = [
   {
