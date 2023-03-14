@@ -385,9 +385,6 @@ export default {
     onChange(event){
        this.file = event.target.files ? event.target.files[0] : null;
     },
-
-    generate
-
     uploadData(){
       for(var i = 0;i < this.selectedDaySheet.length; i++){
         // let data =  {
