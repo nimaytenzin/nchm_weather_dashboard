@@ -290,6 +290,12 @@
   >
     <div style="min-width: 20vw">
       <div class="flex flex-col items-center">
+        <p class="my-2">Date from
+        <input class ="border-2 px-2" type="date" v-model="newAdvisory.dateFrom">
+        </p>
+        <p class="my-2">Date to
+        <input class="border-2 px-2" type="date" v-model="newAdvisory.dateTo">
+        </p>
         <p class="my-2">Advisory in English</p>
         <textarea
           class="p-2 w-full border rounded"
