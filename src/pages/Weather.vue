@@ -35,26 +35,41 @@
         >Add Advisory</button>
       </div>
       <div class="w-10/12 overflow-x-scroll overflow-y-scroll scrollbar-hide h-full">
-        <button @click="uploadData" class="bg-primary flex gap-2 my-2 px-3 py-1 rounded text-white"
-        v-if="selectedSheet">Upload Data: {{selectedSheet}}</button>
-        <input type="file" @change="onChange" />
-        <xlsx-read :file="file">
-          <xlsx-sheets>
-            <template #default="{sheets}">
-              <select v-model="selectedSheet">
-                <option v-for="sheet in sheets" :key="sheet" :value="sheet">
-                  {{ sheet }}
-                </option>
-              </select>
-            </template>
-          </xlsx-sheets>
-          <xlsx-table :sheet="selectedSheet" />
-          <xlsx-json v-show="false" :sheet="selectedSheet" @parsed="onParsed">
-            <template #default="{collection}">
-              <div>{{ collection }}</div>
-            </template>
-          </xlsx-json>
-        </xlsx-read>
+        <p class="bg-primary text-white leading-normal uppercase px-2">Upload Excel File</p>
+        <div class="my-2">
+          <div class="flex">
+            <input type="file" @change="onChange" class="border-2 p-2" />
+            <button
+              @click="uploadData"
+              class="bg-primary flex gap-2 my-2 px-3 py-3 rounded text-white mx-2"
+              v-if="selectedSheet"
+            >Upload Data: {{selectedSheet}}</button>
+            <button
+              @click="resetExcel"
+              class="flex bg-success gap-2 my-2 px-3 py-3 rounded text-white mx-2"
+              v-if="selectedSheet"
+            >FINISH</button>
+            <div v-if="isUpdating" class="my-auto ml-3 text-primary">Uploading...</div>
+            <div v-if="isUpdated" class="my-auto ml-3 text-primary">Updated</div>
+          </div>
+          <div class="border-2 my-2">
+            <xlsx-read :file="file">
+              <xlsx-sheets>
+                <template #default="{sheets}">
+                  <select v-model="selectedSheet">
+                    <option v-for="sheet in sheets" :key="sheet" :value="sheet">{{ sheet }}</option>
+                  </select>
+                </template>
+              </xlsx-sheets>
+              <xlsx-table :sheet="selectedSheet" />
+              <xlsx-json v-show="false" :sheet="selectedSheet" @parsed="onParsed">
+                <template #default="{collection}">
+                  <div>{{ collection }}</div>
+                </template>
+              </xlsx-json>
+            </xlsx-read>
+          </div>
+        </div>
         <table class="min-w-max w-full">
           <thead>
             <tr class="bg-primary text-white uppercase text-sm leading-normal">
@@ -332,11 +347,10 @@ import {
   XlsxSheets,
   XlsxJson,
   XlsxWorkbook,
-  XlsxSheet,
-  XlsxDownload
+  XlsxSheet
 } from "vue3-xlsx";
 
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 export default {
   components: {
@@ -346,8 +360,7 @@ export default {
     XlsxSheets,
     XlsxJson,
     XlsxWorkbook,
-    XlsxSheet,
-    XlsxDownload
+    XlsxSheet
   },
   data: () => ({
     weatherStations: [],
@@ -357,13 +370,14 @@ export default {
     intervals: [],
     intervalForecastData: [],
 
-
-    selectedDaySheet:null,
-    file:null,
+    selectedDaySheet: null,
+    file: null,
     selectedSheet: null,
     sheetName: null,
     sheets: [{ name: "SheetOne", data: [{ c: 2 }] }],
     collection: [{ a: 1, b: 2 }],
+    isUpdated: false,
+    isUpdating: false,
 
     forecastExists: false,
     date: new Date(),
@@ -382,29 +396,145 @@ export default {
     this.fetchAdvisory();
   },
   methods: {
-    onChange(event){
-       this.file = event.target.files ? event.target.files[0] : null;
+    onChange(event) {
+      this.file = event.target.files ? event.target.files[0] : null;
     },
-    uploadData(){
-      for(var i = 0;i < this.selectedDaySheet.length; i++){
-        // let data =  {
-        //   station:
-        // }
+    validateSheet() {
+      const dateString = this.selectedDaySheet[1].Date;
+      //TODO include validate for date
+      return true;
+    },
+    resetExcel() {
+      window.history.go();
+    },
+    async uploadData() {
+      this.isUpdating = true;
+      this.isUpdated = false;
+      if (!this.validateSheet()) {
+        this.isUPdating = false;
+        console.log("invalid excel sheet");
+        return;
       }
+      let fetchData = await this.fetchDailyForecast(
+        this.selectedDaySheet[1].Date
+      );
+      let stationsWithDailyForecasts = fetchData.data;
+      console.log("stations with dail ", stationsWithDailyForecasts);
+
+      let stationWeatherObject = {};
+      for (var i = 0; i < stationsWithDailyForecasts.length; i++) {
+        if (stationsWithDailyForecasts[i].id == undefined) {
+          console.log(
+            "No weather data for this station",
+            stationsWithDailyForecasts[i].name
+          );
+        } else {
+          stationWeatherObject[stationsWithDailyForecasts[i].stationId] =
+            stationsWithDailyForecasts[i];
+        }
+      }
+      for (var i = 1; i < this.selectedDaySheet.length; i++) {
+        //TODO fetch date and fetch daily forecast id for date
+        const stationData =
+          stationWeatherObject[this.selectedDaySheet[i].StationID];
+        if (stationData !== undefined) {
+          console.log("Creating Interval forecasts for: ", stationData.name);
+          let data_1 = {
+            intervalId: 1,
+            maxTemp: this.selectedDaySheet[i].Int_4am_10am,
+            minTemp: this.selectedDaySheet[i].Int_4am_10am,
+            outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY),
+            dailyForecastId: stationData.id
+          };
+          let data_2 = {
+            intervalId: 2,
+            maxTemp: this.selectedDaySheet[i].Int_10am_4pm,
+            minTemp: this.selectedDaySheet[i].Int_10am_4pm,
+            outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY_1),
+            dailyForecastId: stationData.id
+          };
+          let data_3 = {
+            intervalId: 3,
+            maxTemp: this.selectedDaySheet[i].Int_4pm_10pm,
+            minTemp: this.selectedDaySheet[i].Int_4pm_10pm,
+            outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY_2),
+            dailyForecastId: stationData.id
+          };
+          let data_4 = {
+            intervalId: 4,
+            maxTemp: this.selectedDaySheet[i].Int_10pm_4am,
+            minTemp: this.selectedDaySheet[i].Int_10pm_4am,
+            outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY_3),
+            dailyForecastId: stationData.id
+          };
+          await this.uploadIntervalForecastsExcel(data_1);
+          await this.uploadIntervalForecastsExcel(data_2);
+          await this.uploadIntervalForecastsExcel(data_3);
+          await this.uploadIntervalForecastsExcel(data_4);
+        } else {
+          console.log(
+            "Warning: NO daily forecast data for station: ",
+            this.selectedDaySheet[i].Station
+          );
+        }
+      }
+      this.isUpdated = true;
+      this.isUpdating = false;
     },
-    onParsed(event){
-      console.log("on parsed");
-      console.log(event);
-      this.selectedDaySheet = event
-      console.log(event[1].Station)
-      console.log(event[1].Date)
-      console.log(event[2].Station)
-      console.log(event[2].Date)
-      console.log(event[1].Int_4am_10am)
-      console.log(event[1].__EMPTY)
-      console.log(event[1].__EMPTY_1)
-      console.log(event[1].__EMPTY_2)
-      console.log(event[1].__EMPTY_3)
+    outlookMapper(outlookString) {
+      let obj = {
+        Sunny: 1,
+        "Partly Cloudy": 2,
+        "Mostly Cloudy": 3,
+        "Partly Cloudy with Light Rain": 4,
+        "Mostly cloudy with light Rain": 5,
+        "Cloudy with light rain": 6,
+        "Partly cloudy with moderate rain": 7,
+        "Mostly Cloudy with moderate rain": 8,
+        "Cloudy with moderate rain": 9,
+        "Cloudy with heavy rain": 10,
+        "Partly cloudy with light rain/snow": 11,
+        "Mostly cloudy with light rain/snow": 12,
+        "Partly cloudy with light snow": 13,
+        "Mostly cloudy with light snow": 14,
+        "Cloudy with light snow": 15,
+        "Partly cloudy with moderate snow": 16,
+        "Mostly cloudy with moderate snow": 17,
+        "Cloudy with snow": 18
+      };
+      return obj[outlookString];
+    },
+    uploadIntervalForecastsExcel(data) {
+      return CreateNewIntervalForecast(data);
+    },
+    parseExcelDate(dateString) {
+      let splitDate = dateString.split("-");
+      let day = splitDate[0];
+      let month = splitDate[1];
+      let year = splitDate[2];
+
+      if (month.length < 2) month = "0" + month;
+      if (day.length < 2) day = "0" + day;
+
+      return [year, month, day].join("-");
+    },
+    fetchDailyForecast(date) {
+      return GetDailyForecastForAllStationsByDate(this.parseExcelDate(date));
+    },
+    onParsed(event) {
+      console.log("Excel Parsed");
+      console.log(event); //TODO remove this
+
+      this.selectedDaySheet = event;
+      console.log(event[1].Station);
+      console.log(event[1].Date);
+      console.log(event[2].Station);
+      console.log(event[2].Date);
+      console.log(event[1].Int_4am_10am);
+      console.log(event[1].__EMPTY);
+      console.log(event[1].__EMPTY_1);
+      console.log(event[1].__EMPTY_2);
+      console.log(event[1].__EMPTY_3);
       // console.log(event[1])
     },
     fetchAllStations() {
