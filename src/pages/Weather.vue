@@ -615,6 +615,7 @@ export default {
           res => {
             if (res.status === 200) {
               console.log("UDPATED", res.data);
+              this.addAdvisoryModal = true;
             }
           }
         );
