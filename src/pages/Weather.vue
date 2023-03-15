@@ -534,7 +534,7 @@ export default {
       return CreateNewIntervalForecast(data);
     },
     parseExcelDate(dateString) {
-      let splitDate = dateString.split("-");
+      let splitDate = dateString.split(".");
       let day = splitDate[0];
       let month = splitDate[1];
       let year = splitDate[2];
