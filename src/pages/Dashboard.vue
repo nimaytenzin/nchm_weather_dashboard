@@ -24,23 +24,19 @@
           Download as Image
         </div>
         <button @click="exportToPDF">Export to PDF</button>
-      </div> -->
+      </div>-->
       <div id="element-to-convert" class="p-12">
         <div id="header" class="flex px-2 justify-between">
-          <img src="/rgob.jpeg" class="h-20 w-auto" alt="" />
+          <img src="/rgob.jpeg" class="h-20 w-auto" alt />
           <div class="text-center">
-            <p class="text-lg font-bold">
-              National center for Hydrology and Meteorology
-            </p>
-            <p class="text-lg font-bold">
-              རྒྱལ་ཡོངས་ཆུ་དཔྱད་དང་གནམ་གཤིས་རིག་པའི་ལྟེ་བ།
-            </p>
+            <p class="text-lg font-bold">National center for Hydrology and Meteorology</p>
+            <p class="text-lg font-bold">རྒྱལ་ཡོངས་ཆུ་དཔྱད་དང་གནམ་གཤིས་རིག་པའི་ལྟེ་བ།</p>
             <p class="font-xs mt-2">
               Center for excellence in Hydrology,Meteorology and Cryosphere
               Science and Services
             </p>
           </div>
-          <img src="/logo.jpeg" class="h-20 w-auto" alt="" />
+          <img src="/logo.jpeg" class="h-20 w-auto" alt />
         </div>
         <div id="forecastOverview" class="my-6">
           <div class="text-xl text-center font-semibold">
@@ -55,29 +51,21 @@
             @click="openViewDetailWeather(station)"
             class="flex w-full cursor-pointer justify-center shadow bg-primary p-4 shadow-gray-200 border text-white border-gray-50 bg-opacity-60"
           >
-            <div v-if="station.weather" class="">
+            <div v-if="station.weather" class>
               <div class="flex items-center justify-center">
-                <img
-                  class="h-20 w-auto"
-                  :src="getIconUrl(station.weather.outlook?.dayIconUri)"
-                  alt=""
-                />
+                <img class="h-20 w-auto" :src="getIconUrl(station.weather.outlook?.dayIconUri)" alt />
               </div>
               <div class="text-center text-lg font-semibold">
-                <p>
-                  {{ station.name }}
-                </p>
+                <p>{{ station.name }}</p>
               </div>
               <div id="temps">
                 <p class="text-center text-xl">
-                  <span> {{ station.weather?.minTemp }}ºC / </span>
-                  <span> {{ station.weather?.maxTemp }} ºC </span>
+                  <span>{{ station.weather?.minTemp }}ºC /</span>
+                  <span>{{ station.weather?.maxTemp }} ºC</span>
                 </p>
               </div>
               <div id="outlooks" class="text-md mt-1 text-center">
-                <p>
-                  {{ station.weather.outlook?.name }}
-                </p>
+                <p>{{ station.weather.outlook?.name }}</p>
               </div>
             </div>
             <div v-else>
@@ -98,19 +86,15 @@
       classes="w-full h-full bg-black flex  justify-center items-center bg-opacity-20"
       content-class="bg-white  py-6 px-12  text-white bg-primary rounded"
     >
-      <h1 class="text-2xl">
-        {{ selectedStation.name }}
-      </h1>
+      <h1 class="text-2xl">{{ selectedStation.name }}</h1>
       <div class="flex items-center justify-center">
         <img
           class="h-20 w-auto"
           :src="getIconUrl(selectedStation?.weather?.outlook?.dayIconUri)"
-          alt=""
+          alt
         />
       </div>
-      <p>
-        {{ selectedStation?.weather?.outlook?.name }}
-      </p>
+      <p>{{ selectedStation?.weather?.outlook?.name }}</p>
       <div
         id="intervalForecasts"
         class="flex gap-4 text-white px-2"
@@ -122,16 +106,11 @@
           class="py-6 text-center"
         >
           <div class="flex justify-center">
-            <img
-              :src="getIconUrl(forecast.outlook?.dayIconUri)"
-              class="w-auto h-16"
-            />
+            <img :src="getIconUrl(forecast.outlook?.dayIconUri)" class="w-auto h-16" />
           </div>
 
           <div>
-            <p class="text-center font-semibold text-xl">
-              {{ forecast?.minTemp }}ºC
-            </p>
+            <p class="text-center font-semibold text-xl">{{ forecast?.minTemp }}ºC</p>
           </div>
           <p class="text-xs">
             {{ parseIntervalTime(forecast.interval?.startTime) }} -

@@ -31,7 +31,7 @@
           </svg>
           <p class="">Dashboard</p>
         </router-link>
-        <router-link
+        <router-link v-if="isAdmin"
           to="/admin/parameters/"
           class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
           @click="selectTab('parameters')"
@@ -54,6 +54,7 @@
           <span class="">Parameters</span>
         </router-link>
         <router-link
+          v-if="isAdmin"
           to="/admin/api/"
           class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
           @click="selectTab('api')"
@@ -209,10 +210,20 @@
 </template>
 
 <script>
+import VueJwtDecode from 'vue-jwt-decode';
 export default {
   data: () => ({
     selectedTab: "dashboard",
+    isAdmin:false,
   }),
+  created(){
+    if(sessionStorage.getItem("token") !== ""){
+      var decoded = VueJwtDecode.decode(sessionStorage.getItem("token"));
+      if( decoded['role'] == "ADMIN"){
+        this.isAdmin = true
+      }
+    }
+  },
   methods: {
     selectTab(tabName) {
       console.log(tabName, "Selected");

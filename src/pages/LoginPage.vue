@@ -35,6 +35,7 @@
 
 <script>
 import { Login } from "../dataservice/auth.service";
+
 export default {
   created() {
     //   console.log(COMPANYNAME);
@@ -44,8 +45,8 @@ export default {
   data() {
     return {
       loginPayload: {
-        username: "admin",
-        password: "overlord123",
+        username: "",
+        password: "",
       },
     };
   },
