@@ -2,7 +2,8 @@
   <div class="w-full flex bg-primary-surfaceLight">
     <div class="space-y-6 bg-white h-screen shadow">
       <h1 class="font-bold text-xl text-primary-heading1 text-center p-6">
-        NC<span class="text-primary">HM</span>
+        NC
+        <span class="text-primary">HM</span>
       </h1>
       <div>
         <p class="text-xs text-gray-500 text-center">Administrator</p>
@@ -27,11 +28,12 @@
           >
             <path
               d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-            ></path>
+            />
           </svg>
-          <p class="">Dashboard</p>
+          <p class>Dashboard</p>
         </router-link>
-        <router-link v-if="isAdmin"
+        <router-link
+          v-if="isAdmin"
           to="/admin/parameters/"
           class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
           @click="selectTab('parameters')"
@@ -49,9 +51,9 @@
           >
             <path
               d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z"
-            ></path>
+            />
           </svg>
-          <span class="">Parameters</span>
+          <span class>Parameters</span>
         </router-link>
         <router-link
           v-if="isAdmin"
@@ -79,7 +81,7 @@
             </g>
           </svg>
 
-          <span class="">API</span>
+          <span class>API</span>
         </router-link>
         <!-- <router-link
           to="/admin/outlooks/"
@@ -102,7 +104,7 @@
             ></path>
           </svg>
           <span class="">Outlooks</span>
-        </router-link> -->
+        </router-link>-->
 
         <router-link
           to="/admin/weather/"
@@ -129,7 +131,19 @@
             />
           </svg>
 
-          <span class="">Weather Forecast</span>
+          <span class>Weather Forecast</span>
+        </router-link>
+        <router-link
+          to="/"
+          class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
+          @click="selectTab('logout')"
+          :class="
+            selectedTab === 'logout'
+              ? 'bg-primary text-primary-textOnPrimary '
+              : 'text-primary-heading1'
+          "
+        >
+          <span class>Logout</span>
         </router-link>
         <!-- <router-link
           to="/admin/map/"
@@ -157,7 +171,7 @@
           </svg>
 
           <span class="">Weather Map</span>
-        </router-link> -->
+        </router-link>-->
         <!-- 
         <router-link
           to="/admin/forecast/"
@@ -185,7 +199,7 @@
           </svg>
 
           <span class="">Forecast </span>
-        </router-link> -->
+        </router-link>-->
 
         <!-- <router-link
           to="/admin/about/"
@@ -200,7 +214,7 @@
           <img src="/logotrans.png" class="w-6 h-6" alt="" />
 
           <span class="">About NCHM </span>
-        </router-link> -->
+        </router-link>-->
       </div>
     </div>
     <div class="flex-1 h-screen overflow-hidden">
@@ -210,17 +224,17 @@
 </template>
 
 <script>
-import VueJwtDecode from 'vue-jwt-decode';
+import VueJwtDecode from "vue-jwt-decode";
 export default {
   data: () => ({
     selectedTab: "dashboard",
-    isAdmin:false,
+    isAdmin: false
   }),
-  created(){
-    if(sessionStorage.getItem("token") !== ""){
+  created() {
+    if (sessionStorage.getItem("token") !== "") {
       var decoded = VueJwtDecode.decode(sessionStorage.getItem("token"));
-      if( decoded['role'] == "ADMIN"){
-        this.isAdmin = true
+      if (decoded["role"] == "ADMIN") {
+        this.isAdmin = true;
       }
     }
   },
@@ -228,7 +242,7 @@ export default {
     selectTab(tabName) {
       console.log(tabName, "Selected");
       this.selectedTab = tabName;
-    },
-  },
+    }
+  }
 };
 </script>

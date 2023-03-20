@@ -248,7 +248,11 @@ export default {
       this.$router.push("/admin/detailedWeather/" + stationName);
     },
     fetchDailyForecasts() {
-      GetDailyForecastForAllStationsByDate("2022-12-27").then((res) => {
+      var dd = new Date();
+      var ds = dd.toLocaleDateString()
+      var da = ds.split("/")
+      var dateString = da[2] + "-" + da[0] + "-" + da[1];
+      GetDailyForecastForAllStationsByDate(dateString).then((res) => {
         console.log("Stations with Forecast");
         console.log(res);
         this.stationsWithForecast = res.data;

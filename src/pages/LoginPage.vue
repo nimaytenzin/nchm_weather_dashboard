@@ -41,6 +41,7 @@ export default {
     //   console.log(COMPANYNAME);
     //   console.log("welcome to login");
     //  useToast().warning("Helo");
+    sessionStorage.clear();
   },
   data() {
     return {
