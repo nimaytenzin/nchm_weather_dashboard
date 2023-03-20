@@ -290,11 +290,13 @@
   >
     <div style="min-width: 20vw">
       <div class="flex flex-col items-center">
-        <p class="my-2">Date from
-        <input class ="border-2 px-2" type="date" v-model="newAdvisory.dateFrom">
+        <p class="my-2">
+          Date from
+          <input class="border-2 px-2" type="date" v-model="newAdvisory.dateFrom" />
         </p>
-        <p class="my-2">Date to
-        <input class="border-2 px-2" type="date" v-model="newAdvisory.dateTo">
+        <p class="my-2">
+          Date to
+          <input class="border-2 px-2" type="date" v-model="newAdvisory.dateTo" />
         </p>
         <p class="my-2">Advisory in English</p>
         <textarea
@@ -356,7 +358,9 @@ import {
 
 import {
   CreateNewIntervalForecast,
-  GetIntervalForecastByDailyForecastId
+  GetIntervalForecastByDailyForecastId,
+  updateExistingIntervalForecasts,
+  FindExistingIntervalForecasts
 } from "../dataservice/intervalforecast.service";
 
 import { BackendApi, TimeRange } from "../constants.js";
@@ -460,7 +464,6 @@ export default {
         }
       }
       for (var i = 1; i < this.selectedDaySheet.length; i++) {
-        //TODO fetch date and fetch daily forecast id for date
         const stationData =
           stationWeatherObject[this.selectedDaySheet[i].StationID];
         if (stationData !== undefined) {
@@ -493,10 +496,10 @@ export default {
             outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY_3),
             dailyForecastId: stationData.id
           };
-          await this.uploadIntervalForecastsExcel(data_1);
-          await this.uploadIntervalForecastsExcel(data_2);
-          await this.uploadIntervalForecastsExcel(data_3);
-          await this.uploadIntervalForecastsExcel(data_4);
+          await this.uploadIntervalForecastsExcel(stationData.id, data_1);
+          await this.uploadIntervalForecastsExcel(stationData.id, data_2);
+          await this.uploadIntervalForecastsExcel(stationData.id, data_3);
+          await this.uploadIntervalForecastsExcel(stationData.id, data_4);
         } else {
           console.log(
             "Warning: NO daily forecast data for station: ",
@@ -530,8 +533,28 @@ export default {
       };
       return obj[outlookString];
     },
-    uploadIntervalForecastsExcel(data) {
-      return CreateNewIntervalForecast(data);
+    async uploadIntervalForecastsExcel(dailyForecastsId, data) {
+      console.log("this is intttt id",data["intervalId"]);
+      var intForecastsId = await this.findExistingIntervalForecasts(
+        dailyForecastsId,
+        data["intervalId"]
+      );
+      if (intForecastsId !== 0) {
+        return updateExistingIntervalForecasts(intForecastsId, data);
+      } else {
+        return CreateNewIntervalForecast(data);
+      }
+    },
+    async findExistingIntervalForecasts(dailyForecastsId, IntervalId) {
+      const data = await FindExistingIntervalForecasts(
+        dailyForecastsId,
+        IntervalId
+      );
+      const intervalForecastId = data.data.id
+      if (intervalForecastId == undefined) {
+        return 0;
+      }
+      return intervalForecastId;
     },
     parseExcelDate(dateString) {
       let splitDate = dateString.split(".");
