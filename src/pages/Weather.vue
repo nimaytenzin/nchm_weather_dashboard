@@ -496,10 +496,8 @@ export default {
             outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY_3),
             dailyForecastId: stationData.id
           };
-          await this.uploadIntervalForecastsExcel(stationData.id, data_1);
-          await this.uploadIntervalForecastsExcel(stationData.id, data_2);
-          await this.uploadIntervalForecastsExcel(stationData.id, data_3);
-          await this.uploadIntervalForecastsExcel(stationData.id, data_4);
+          let intervalData = [data_1, data_2, data_3, data_4];
+          await this.uploadIntervalForecastsExcel(stationData.id, intervalData);
         } else {
           console.log(
             "Warning: NO daily forecast data for station: ",
@@ -533,8 +531,14 @@ export default {
       };
       return obj[outlookString];
     },
-    async uploadIntervalForecastsExcel(dailyForecastsId, data) {
-      console.log("this is intttt id",data["intervalId"]);
+    async uploadIntervalForecastsExcel(dailyForecastsId, dataArray) {
+      let updateArray = [];
+      for (var i = 0; i < dataArray.length; i++) {
+        if (dataArray[i].maxTemp !== 0) {
+          updateArray.add(dataArray[i]);
+        }
+      }
+      console.log("this is intttt id", data["intervalId"]);
       var intForecastsId = await this.findExistingIntervalForecasts(
         dailyForecastsId,
         data["intervalId"]
@@ -550,7 +554,7 @@ export default {
         dailyForecastsId,
         IntervalId
       );
-      const intervalForecastId = data.data.id
+      const intervalForecastId = data.data.id;
       if (intervalForecastId == undefined) {
         return 0;
       }
