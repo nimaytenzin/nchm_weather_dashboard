@@ -544,7 +544,7 @@ export default {
         data["intervalId"]
       );
       if (intForecastsId !== 0) {
-        return updateExistingIntervalForecasts(intForecastsId, data);
+        return updateExistingIntervalfffsForecasts(intForecastsId, data);
       } else {
         return CreateNewIntervalForecast(data);
       }
@@ -641,7 +641,7 @@ export default {
         UpdateWeatherAdvisory(this.newAdvisory.id, this.newAdvisory).then(
           res => {
             if (res.status === 200) {
-              console.log("UDPATED", res.data);
+              console.log("UPDATED", res.data);
               this.addAdvisoryModal = true;
             }
           }

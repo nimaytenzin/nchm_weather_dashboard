@@ -20,6 +20,24 @@ export async function GetDailyForecastByDate(date) {
   });
 }
 
+export async function GetIntervalMapper() {
+  return await axios.get(`${BackendApi}/interval`, {
+    headers: authHeader(),
+  });
+}
+
+export async function GetOutlookMapper() {
+  return await axios.get(`${BackendApi}/outlook`, {
+    headers: authHeader(),
+  });
+}
+
+export async function GetDailyForecastForAllStationsToday() {
+  return await axios.get(`${BackendApi}/station/allweather/today`, {
+    headers: authHeader(),
+  });
+}
+
 export async function GetDailyForecastForAllStationsByDate(date) {
   return await axios.get(`${BackendApi}/station/forecast/${date}`, {
     headers: authHeader(),

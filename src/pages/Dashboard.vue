@@ -53,19 +53,20 @@
           >
             <div v-if="station.weather" class>
               <div class="flex items-center justify-center">
-                <img class="h-20 w-auto" :src="getIconUrl(station.weather.outlook?.dayIconUri)" alt />
+                <!-- <img class="h-20 w-auto" :src="getIconUrl(station.weather.outlook?.dayIconUri)" alt /> -->
+                <img class="h-20 w-auto" :src="getIconUrl(outlookHash[station.weather[0].outlookId].dayIconUri)" alt />
               </div>
               <div class="text-center text-lg font-semibold">
                 <p>{{ station.name }}</p>
               </div>
               <div id="temps">
                 <p class="text-center text-xl">
-                  <span>{{ station.weather?.minTemp }}ºC /</span>
-                  <span>{{ station.weather?.maxTemp }} ºC</span>
+                  <span>{{ station.weather[0].minTemp }}ºC /</span>
+                  <span>{{ station.weather[0].maxTemp }} ºC</span>
                 </p>
               </div>
               <div id="outlooks" class="text-md mt-1 text-center">
-                <p>{{ station.weather.outlook?.name }}</p>
+                <p>{{ outlookHash[station.weather[0].outlookId].name }}</p>
               </div>
             </div>
             <div v-else>
@@ -90,31 +91,32 @@
       <div class="flex items-center justify-center">
         <img
           class="h-20 w-auto"
-          :src="getIconUrl(selectedStation?.weather?.outlook?.dayIconUri)"
+          :src="getIconUrl(outlookHash[selectedStation.weather ?  selectedStation.weather[0].outlookId : 1 ]?.dayIconUri)"
           alt
         />
       </div>
-      <p>{{ selectedStation?.weather?.outlook?.name }}</p>
+      <p>{{ outlookHash[selectedStation.weather ?  selectedStation.weather[0].outlookId : 1]?.name }}</p>
       <div
         id="intervalForecasts"
         class="flex gap-4 text-white px-2"
-        v-if="selectedStation.weather?.intervalForecast?.length"
+        v-if="selectedStation.intervalForecast?.length"
       >
         <div
-          v-for="forecast in selectedStation.weather?.intervalForecast"
+          v-for="forecast in selectedStation.intervalForecast"
           :key="forecast"
           class="py-6 text-center"
         >
           <div class="flex justify-center">
-            <img :src="getIconUrl(forecast.outlook?.dayIconUri)" class="w-auto h-16" />
+            <img :src="getIconUrl(outlookHash[forecast.outlookId].dayIconUri)" class="w-auto h-16" />
           </div>
 
           <div>
-            <p class="text-center font-semibold text-xl">{{ forecast?.minTemp }}ºC</p>
+            <p class="text-center font-semibold text-xl">{{ forecast.minTemp }}ºC</p>
           </div>
           <p class="text-xs">
-            {{ parseIntervalTime(forecast.interval?.startTime) }} -
-            {{ parseIntervalTime(forecast.interval?.endTime) }}
+            {{ intervalHash[forecast.intervalId].name }}
+            <!-- {{ intervalHash[forecast.intervalId].name }}
+            {{ parseIntervalTime(forecast.interval?.endTime) }} -->
           </p>
         </div>
       </div>
@@ -171,7 +173,12 @@
 import { GetAllWeatherStations } from "../dataservice/weather-station.service";
 import { Switch } from "@headlessui/vue";
 import { toDzongkha } from "../dataservice/dzongkhalang.service";
-import { GetDailyForecastForAllStationsByDate } from "../dataservice/daily-forecast.service";
+import {
+  GetDailyForecastForAllStationsByDate,
+  GetOutlookMapper,
+  GetIntervalMapper,
+  GetDailyForecastForAllStationsToday
+} from "../dataservice/daily-forecast.service";
 import VueJsonPretty from "vue-json-pretty";
 import "vue-json-pretty/lib/styles.css";
 import { BackendApi, TimeRange } from "../constants";
@@ -180,20 +187,24 @@ import html2pdf from "html2pdf.js";
 export default {
   components: {
     Switch,
-    VueJsonPretty,
+    VueJsonPretty
   },
   data: () => ({
     stations: [],
     dzongkhaMode: false,
     stationsWithForecast: [],
     date: new Date(),
+    outlookHash: {},
+    intervalHash: {},
 
     selectedStation: {},
-    viewDetailedWeatherModal: false,
+    viewDetailedWeatherModal: false
   }),
 
   created() {
-    GetAllWeatherStations().then((res) => {
+    this.getOutlookMapper();
+    this.getIntervalMapper();
+    GetAllWeatherStations().then(res => {
       this.stations = res.data;
     });
 
@@ -216,7 +227,7 @@ export default {
       html2pdf(document.getElementById("element-to-convert"), {
         margin: 12,
         filename: "weatherReport.pdf",
-        html2canvas: { scale: 2 },
+        html2canvas: { scale: 2 }
       });
     },
 
@@ -243,21 +254,40 @@ export default {
       }
       return "clear";
     },
-
+    getOutlookMapper() {
+      GetOutlookMapper().then(res => {
+        let data = res.data;
+        for (var i = 0; i < data.length; i++) {
+          this.outlookHash[data[i].id] = data[i];
+        }
+      });
+    },
+    getIntervalMapper() {
+      GetIntervalMapper().then(res => {
+        let data = res.data;
+        for (var i = 0; i < data.length; i++) {
+          this.intervalHash[data[i].id] = data[i];
+        }
+      });
+    },
     showDetailedWeather(stationName) {
       this.$router.push("/admin/detailedWeather/" + stationName);
     },
     fetchDailyForecasts() {
-      var dd = new Date();
-      var ds = dd.toLocaleDateString()
-      var da = ds.split("/")
-      var dateString = da[2] + "-" + da[0] + "-" + da[1];
-      GetDailyForecastForAllStationsByDate(dateString).then((res) => {
-        console.log("Stations with Forecast");
-        console.log(res);
-        this.stationsWithForecast = res.data;
+      GetDailyForecastForAllStationsToday().then(res => {
+        let forecast = res.data;
+        for (var i = 0; i < forecast.length; i++) {
+          if (forecast[i].intervalForecast.length > 0) {
+            if (forecast[i].intervalForecast[0].intervalId == 5) {
+              forecast[i].weather[0].outlookId = forecast[ i ].intervalForecast[0].outlookId;
+              forecast[i].weather[0].minTemp = forecast[ i ].intervalForecast[0].minTemp;
+              forecast[i].weather[0].maxTemp = forecast[ i ].intervalForecast[0].maxTemp;
+            }
+          }
+        }
+        this.stationsWithForecast = forecast;
       });
-    },
-  },
+    }
+  }
 };
 </script>
