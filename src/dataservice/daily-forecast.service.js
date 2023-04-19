@@ -39,7 +39,7 @@ export async function GetDailyForecastForAllStationsToday() {
 }
 
 export async function GetDailyForecastForAllStationsByDate(date) {
-  return await axios.get(`${BackendApi}/station/forecast/${date}`, {
+  return await axios.get(`${BackendApi}/station/date/${date}`, {
     headers: authHeader(),
   });
 }

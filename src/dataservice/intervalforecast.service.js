@@ -8,6 +8,12 @@ export async function CreateNewIntervalForecast(data) {
   });
 }
 
+export async function upsertIntervalForecast(data) {
+  return await axios.post(`${BackendApi}/interval-forecast/upsert`, data, {
+    headers: authHeader(),
+  });
+}
+
 export async function FindExistingIntervalForecasts(dailyforecastId,intervalId) {
   return await axios.get(`${BackendApi}/interval-forecast/did/${dailyforecastId}/int/${intervalId}`);
 }

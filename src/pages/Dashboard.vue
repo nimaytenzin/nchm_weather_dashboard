@@ -174,7 +174,6 @@ import { GetAllWeatherStations } from "../dataservice/weather-station.service";
 import { Switch } from "@headlessui/vue";
 import { toDzongkha } from "../dataservice/dzongkhalang.service";
 import {
-  GetDailyForecastForAllStationsByDate,
   GetOutlookMapper,
   GetIntervalMapper,
   GetDailyForecastForAllStationsToday

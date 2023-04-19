@@ -110,7 +110,7 @@
                   <span class="font-medium">{{ station.name }}</span>
                 </div>
                 <div
-                  v-if="station.weather?.intervalForecast?.length"
+                  v-if="station.intervalForecast.length"
                   class="flex text-green-600 text-sm items-center cursor-pointer hover:underline"
                   @click="openUpdateIntervalModal(station)"
                 >
@@ -154,28 +154,28 @@
               </td>
               <td class="p-3 text-left">
                 <input
-                  v-model="station.weather.minTemp"
+                  v-model="station.weather[0].minTemp"
                   type="number"
                   class="border border-gray-200 rounded p-1"
                 />
               </td>
               <td class="p-3 text-center">
                 <input
-                  v-model="station.weather.maxTemp"
+                  v-model="station.weather[0].maxTemp"
                   type="number"
                   class="border border-gray-200 rounded p-1"
                 />
               </td>
               <td class="p-3 text-center">
                 <select
-                  v-model="station.weather.outlookId"
+                  v-model="station.weather[0].outlookId"
                   class="border border-gray-200 rounded p-1"
                 >
                   <option
                     v-for="outlook in outlooks"
                     :key="outlook"
                     :value="outlook.id"
-                  >{{ outlook.name }}</option>
+                  >{{ outlook.name}}</option>
                 </select>
               </td>
             </tr>
@@ -214,21 +214,7 @@
             <td class="p-3 text-left whitespace-nowrap">
               <div class="flex items-center">
                 <span class="font-medium">
-                  {{
-                  parseTime(
-                  interval.startTime
-                  ? interval.startTime
-                  : interval.interval.startTime
-                  )
-                  }}
-                  -
-                  {{
-                  parseTime(
-                  interval.endTime
-                  ? interval.endTime
-                  : interval.interval.endTime
-                  )
-                  }}
+                  {{ intervalHash[interval.intervalId ? interval.intervalId : 5].name }}
                 </span>
               </div>
             </td>
@@ -348,7 +334,6 @@
 </template>
 
 <script>
-import { GetAllWeatherOutlooks } from "../dataservice/outlooks.service.js";
 import { GetAllWeatherStations } from "../dataservice/weather-station.service.js";
 import DailyForecastComponent from "./Forecast/DailyForecast.vue";
 import {
@@ -358,13 +343,17 @@ import {
 
 import {
   CreateNewIntervalForecast,
-  GetIntervalForecastByDailyForecastId,
-  updateExistingIntervalForecasts,
-  FindExistingIntervalForecasts
+  FindExistingIntervalForecasts,
+  upsertIntervalForecast
 } from "../dataservice/intervalforecast.service";
 
+import {
+  GetOutlookMapper,
+  GetIntervalMapper,
+  GetDailyForecastForAllStationsToday
+} from "../dataservice/daily-forecast.service";
+
 import { BackendApi, TimeRange } from "../constants.js";
-import { GetAllIntervals } from "../dataservice/interval.service.js";
 import {
   CreateNewWeatherAdvisory,
   GetWeatherAdvisoryByDate,
@@ -396,8 +385,11 @@ export default {
     weatherStations: [],
     selectedStation: {},
     stationsWithForecast: [],
+    outlookHash: {},
     outlooks: [],
-    intervals: [],
+    intervalHash: {},
+    intervalHashReverse: {},
+    intervals:[],
     intervalForecastData: [],
 
     selectedDaySheet: null,
@@ -440,6 +432,8 @@ export default {
     async uploadData() {
       this.isUpdating = true;
       this.isUpdated = false;
+      var dateNumber = this.excelDateToDateNumber(this.selectedDaySheet[1].Date);
+
       if (!this.validateSheet()) {
         this.isUPdating = false;
         console.log("invalid excel sheet");
@@ -464,40 +458,34 @@ export default {
         }
       }
       for (var i = 1; i < this.selectedDaySheet.length; i++) {
-        const stationData =
-          stationWeatherObject[this.selectedDaySheet[i].StationID];
-        if (stationData !== undefined) {
-          console.log("Creating Interval forecasts for: ", stationData.name);
+        if (this.selectedDaySheet[i].StationID !== undefined) {
+          console.log("Creating Interval forecasts for: ", this.selectedDaySheet[i].Station);
           let data_1 = {
-            intervalId: 1,
-            maxTemp: this.selectedDaySheet[i].Int_4am_10am,
-            minTemp: this.selectedDaySheet[i].Int_4am_10am,
-            outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY),
-            dailyForecastId: stationData.id
+            intervalId: this.intervalHashReverse['Morning'],
+            maxTemp: this.selectedDaySheet[i].Morning,
+            minTemp: this.selectedDaySheet[i].Morning,
+            outlookId: this.outlookHash[this.selectedDaySheet[i].__EMPTY],
+            stationId: this.selectedDaySheet[i].StationID,
+            dateNumber: dateNumber
           };
           let data_2 = {
-            intervalId: 2,
-            maxTemp: this.selectedDaySheet[i].Int_10am_4pm,
-            minTemp: this.selectedDaySheet[i].Int_10am_4pm,
-            outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY_1),
-            dailyForecastId: stationData.id
+            intervalId: this.intervalHashReverse['Afternoon'],
+            maxTemp: this.selectedDaySheet[i].Afternoon,
+            minTemp: this.selectedDaySheet[i].Afternoon,
+            outlookId: this.outlookHash[this.selectedDaySheet[i].__EMPTY_1],
+            stationId: this.selectedDaySheet[i].StationID,
+            dateNumber: dateNumber
           };
           let data_3 = {
-            intervalId: 3,
-            maxTemp: this.selectedDaySheet[i].Int_4pm_10pm,
-            minTemp: this.selectedDaySheet[i].Int_4pm_10pm,
-            outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY_2),
-            dailyForecastId: stationData.id
+            intervalId: this.intervalHashReverse['Evening'],
+            maxTemp: this.selectedDaySheet[i].Evening,
+            minTemp: this.selectedDaySheet[i].Evening,
+            outlookId: this.outlookHash[this.selectedDaySheet[i].__EMPTY_3],
+            stationId: this.selectedDaySheet[i].StationID,
+            dateNumber: dateNumber
           };
-          let data_4 = {
-            intervalId: 4,
-            maxTemp: this.selectedDaySheet[i].Int_10pm_4am,
-            minTemp: this.selectedDaySheet[i].Int_10pm_4am,
-            outlookId: this.outlookMapper(this.selectedDaySheet[i].__EMPTY_3),
-            dailyForecastId: stationData.id
-          };
-          let intervalData = [data_1, data_2, data_3, data_4];
-          await this.uploadIntervalForecastsExcel(stationData.id, intervalData);
+          let intervalData = [data_1, data_2, data_3];
+          await this.uploadIntervalForecastsExcel(intervalData);
         } else {
           console.log(
             "Warning: NO daily forecast data for station: ",
@@ -508,46 +496,14 @@ export default {
       this.isUpdated = true;
       this.isUpdating = false;
     },
-    outlookMapper(outlookString) {
-      let obj = {
-        Sunny: 1,
-        "Partly Cloudy": 2,
-        "Mostly Cloudy": 3,
-        "Partly Cloudy with Light Rain": 4,
-        "Mostly cloudy with light Rain": 5,
-        "Cloudy with light rain": 6,
-        "Partly cloudy with moderate rain": 7,
-        "Mostly Cloudy with moderate rain": 8,
-        "Cloudy with moderate rain": 9,
-        "Cloudy with heavy rain": 10,
-        "Partly cloudy with light rain/snow": 11,
-        "Mostly cloudy with light rain/snow": 12,
-        "Partly cloudy with light snow": 13,
-        "Mostly cloudy with light snow": 14,
-        "Cloudy with light snow": 15,
-        "Partly cloudy with moderate snow": 16,
-        "Mostly cloudy with moderate snow": 17,
-        "Cloudy with snow": 18
-      };
-      return obj[outlookString];
+
+    getIntervalId(sheetNumber){
+      var columnNames = Object.keys(this.selectedDaySheet[sheetNumber]);
+      var columnIdArray
+
     },
-    async uploadIntervalForecastsExcel(dailyForecastsId, dataArray) {
-      let updateArray = [];
-      for (var i = 0; i < dataArray.length; i++) {
-        if (dataArray[i].maxTemp !== 0) {
-          updateArray.add(dataArray[i]);
-        }
-      }
-      console.log("this is intttt id", data["intervalId"]);
-      var intForecastsId = await this.findExistingIntervalForecasts(
-        dailyForecastsId,
-        data["intervalId"]
-      );
-      if (intForecastsId !== 0) {
-        return updateExistingIntervalfffsForecasts(intForecastsId, data);
-      } else {
-        return CreateNewIntervalForecast(data);
-      }
+    async uploadIntervalForecastsExcel(dataArray) {
+      return upsertIntervalForecast(dataArray);
     },
     async findExistingIntervalForecasts(dailyForecastsId, IntervalId) {
       const data = await FindExistingIntervalForecasts(
@@ -571,24 +527,23 @@ export default {
 
       return [year, month, day].join("-");
     },
+    excelDateToDateNumber(dateString){
+      let splitDate = dateString.split(".");
+      let day = splitDate[0];
+      let month = splitDate[1];
+      let year = splitDate[2];
+
+      if (month.length < 2) month = "0" + month;
+      if (day.length < 2) day = "0" + day;
+
+      return [year, month, day].join("");
+    },
     fetchDailyForecast(date) {
       return GetDailyForecastForAllStationsByDate(this.parseExcelDate(date));
     },
     onParsed(event) {
       console.log("Excel Parsed");
-      console.log(event); //TODO remove this
-
       this.selectedDaySheet = event;
-      console.log(event[1].Station);
-      console.log(event[1].Date);
-      console.log(event[2].Station);
-      console.log(event[2].Date);
-      console.log(event[1].Int_4am_10am);
-      console.log(event[1].__EMPTY);
-      console.log(event[1].__EMPTY_1);
-      console.log(event[1].__EMPTY_2);
-      console.log(event[1].__EMPTY_3);
-      // console.log(event[1])
     },
     fetchAllStations() {
       GetAllWeatherStations().then(res => {
@@ -597,14 +552,20 @@ export default {
       });
     },
     fetchAllForecastIntervals() {
-      GetAllIntervals().then(res => {
-        console.log(res);
+      GetIntervalMapper().then(res=>{
         this.intervals = res.data;
-      });
+        for (var i = 0; i < this.intervals.length; i++) {
+          this.intervalHash[this.intervals[i].id] = this.intervals[i];
+          this.intervalHashReverse[this.intervals[i].name] = this.intervals[i].id;
+        }
+      })
     },
     fetchAllOutlooks() {
-      GetAllWeatherOutlooks().then(res => {
+      GetOutlookMapper().then(res => {
         this.outlooks = res.data;
+        for (var i = 0; i < this.outlooks.length; i++) {
+          this.outlookHash[this.outlooks[i].id] = this.outlooks[i];
+        }
       });
     },
 
@@ -658,11 +619,11 @@ export default {
       this.selectedStation = station;
       this.intervalForecastData = [];
       if (
-        this.selectedStation.weather.intervalForecast &&
-        this.selectedStation.weather.intervalForecast.length
+        this.selectedStation.intervalForecast &&
+        this.selectedStation.intervalForecast.length
       ) {
         console.log("IntervalForecastExists");
-        this.intervalForecastData = this.selectedStation.weather.intervalForecast;
+        this.intervalForecastData = this.selectedStation.intervalForecast;
         console.log(this.intervalForecastData);
       } else {
         console.log("IntervalFOrecast DOesnot exist");
@@ -671,7 +632,9 @@ export default {
             startTime: interval.startTime,
             endTime: interval.endTime,
             intervalId: interval.id,
-            dailyForecastId: this.selectedStation.weather.id
+            outlookId: this.outlooks[0].id,
+            dateNumber: this.selectedStation.weather[0].dateNumber,
+            stationId: this.selectedStation.id,
           };
           this.intervalForecastData.push(data);
         });
@@ -727,7 +690,7 @@ export default {
       if (month.length < 2) month = "0" + month;
       if (day.length < 2) day = "0" + day;
 
-      return [year, month, day].join("-");
+      return [year, month, day].join("");
     }
   }
 };
