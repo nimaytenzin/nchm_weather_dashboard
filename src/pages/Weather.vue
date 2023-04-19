@@ -71,6 +71,7 @@
               </div>
             </div>
             <div v-if="isUpdated" class="my-auto ml-3 text-primary">Updated</div>
+            <div v-if="isError" class="my-auto ml-3 text-red-400">Error Occurred</div>
           </div>
           <div class="border-2 my-2">
             <xlsx-read :file="file">
@@ -213,9 +214,9 @@
           >
             <td class="p-3 text-left whitespace-nowrap">
               <div class="flex items-center">
-                <span class="font-medium">
-                  {{ intervalHash[interval.intervalId ? interval.intervalId : 5].name }}
-                </span>
+                <span
+                  class="font-medium"
+                >{{ intervalHash[interval.intervalId ? interval.intervalId : 5].name }}</span>
               </div>
             </td>
             <td class="p-3 text-left">
@@ -386,10 +387,11 @@ export default {
     selectedStation: {},
     stationsWithForecast: [],
     outlookHash: {},
+    outlookHashReverse: {},
     outlooks: [],
     intervalHash: {},
     intervalHashReverse: {},
-    intervals:[],
+    intervals: [],
     intervalForecastData: [],
 
     selectedDaySheet: null,
@@ -399,6 +401,7 @@ export default {
     sheets: [{ name: "SheetOne", data: [{ c: 2 }] }],
     collection: [{ a: 1, b: 2 }],
     isUpdated: false,
+    isError: false,
     isUpdating: false,
 
     forecastExists: false,
@@ -432,75 +435,90 @@ export default {
     async uploadData() {
       this.isUpdating = true;
       this.isUpdated = false;
-      var dateNumber = this.excelDateToDateNumber(this.selectedDaySheet[1].Date);
+      this.isError = false;
+      try {
+        var dateNumber = this.excelDateToDateNumber(
+          this.selectedDaySheet[1].Date
+        );
 
-      if (!this.validateSheet()) {
-        this.isUPdating = false;
-        console.log("invalid excel sheet");
-        return;
-      }
-      let fetchData = await this.fetchDailyForecast(
-        this.selectedDaySheet[1].Date
-      );
-      let stationsWithDailyForecasts = fetchData.data;
-      console.log("stations with dail ", stationsWithDailyForecasts);
+        if (!this.validateSheet()) {
+          this.isUPdating = false;
+          console.log("invalid excel sheet");
+          return;
+        }
+        let fetchData = await this.fetchDailyForecast(
+          this.selectedDaySheet[1].Date
+        );
+        let stationsWithDailyForecasts = fetchData.data;
+        console.log("stations with daily forecast ", stationsWithDailyForecasts);
 
-      let stationWeatherObject = {};
-      for (var i = 0; i < stationsWithDailyForecasts.length; i++) {
-        if (stationsWithDailyForecasts[i].id == undefined) {
-          console.log(
-            "No weather data for this station",
-            stationsWithDailyForecasts[i].name
-          );
-        } else {
-          stationWeatherObject[stationsWithDailyForecasts[i].stationId] =
-            stationsWithDailyForecasts[i];
+        let stationWeatherObject = {};
+        for (var i = 0; i < stationsWithDailyForecasts.length; i++) {
+          if (stationsWithDailyForecasts[i].id == undefined) {
+            console.log(
+              "No weather data for this station",
+              stationsWithDailyForecasts[i].name
+            );
+          } else {
+            stationWeatherObject[stationsWithDailyForecasts[i].stationId] =
+              stationsWithDailyForecasts[i];
+          }
         }
-      }
-      for (var i = 1; i < this.selectedDaySheet.length; i++) {
-        if (this.selectedDaySheet[i].StationID !== undefined) {
-          console.log("Creating Interval forecasts for: ", this.selectedDaySheet[i].Station);
-          let data_1 = {
-            intervalId: this.intervalHashReverse['Morning'],
-            maxTemp: this.selectedDaySheet[i].Morning,
-            minTemp: this.selectedDaySheet[i].Morning,
-            outlookId: this.outlookHash[this.selectedDaySheet[i].__EMPTY],
-            stationId: this.selectedDaySheet[i].StationID,
-            dateNumber: dateNumber
-          };
-          let data_2 = {
-            intervalId: this.intervalHashReverse['Afternoon'],
-            maxTemp: this.selectedDaySheet[i].Afternoon,
-            minTemp: this.selectedDaySheet[i].Afternoon,
-            outlookId: this.outlookHash[this.selectedDaySheet[i].__EMPTY_1],
-            stationId: this.selectedDaySheet[i].StationID,
-            dateNumber: dateNumber
-          };
-          let data_3 = {
-            intervalId: this.intervalHashReverse['Evening'],
-            maxTemp: this.selectedDaySheet[i].Evening,
-            minTemp: this.selectedDaySheet[i].Evening,
-            outlookId: this.outlookHash[this.selectedDaySheet[i].__EMPTY_3],
-            stationId: this.selectedDaySheet[i].StationID,
-            dateNumber: dateNumber
-          };
-          let intervalData = [data_1, data_2, data_3];
-          await this.uploadIntervalForecastsExcel(intervalData);
-        } else {
-          console.log(
-            "Warning: NO daily forecast data for station: ",
-            this.selectedDaySheet[i].Station
-          );
+        for (var i = 1; i < this.selectedDaySheet.length; i++) {
+          if (this.selectedDaySheet[i].StationID !== undefined) {
+            console.log(
+              "Creating Interval forecasts for: ",
+              this.selectedDaySheet[i].Station
+            );
+            var outlook1 = this.selectedDaySheet[i].__EMPTY;
+            var outlook2 = this.selectedDaySheet[i].__EMPTY_1;
+            var outlook3 = this.selectedDaySheet[i].__EMPTY_2;
+
+            let data_1 = {
+              intervalId: this.intervalHashReverse["Morning"],
+              maxTemp: this.selectedDaySheet[i].Morning,
+              minTemp: this.selectedDaySheet[i].Morning,
+              outlookId: this.outlookHashReverse[outlook1.toLowerCase().replace(/\s/g,'')].id,
+              stationId: this.selectedDaySheet[i].StationID,
+              dateNumber: dateNumber
+            };
+            let data_2 = {
+              intervalId: this.intervalHashReverse["Afternoon"],
+              maxTemp: this.selectedDaySheet[i].Afternoon,
+              minTemp: this.selectedDaySheet[i].Afternoon,
+              outlookId: this.outlookHashReverse[outlook2.toLowerCase().replace(/\s/g,'')].id,
+              stationId: this.selectedDaySheet[i].StationID,
+              dateNumber: dateNumber
+            };
+            let data_3 = {
+              intervalId: this.intervalHashReverse["Evening"],
+              maxTemp: this.selectedDaySheet[i].Evening,
+              minTemp: this.selectedDaySheet[i].Evening,
+              outlookId: this.outlookHashReverse[outlook3.toLowerCase().replace(/\s/g,'')].id,
+              stationId: this.selectedDaySheet[i].StationID,
+              dateNumber: dateNumber
+            };
+            let intervalData = [data_1, data_2,data_3 ];
+            await this.uploadIntervalForecastsExcel(intervalData);
+          } else {
+            console.log(
+              "Warning: NO daily forecast data for station: ",
+              this.selectedDaySheet[i].Station
+            );
+          }
         }
+        this.isUpdated = true;
+        this.isUpdating = false;
+      }catch(err){
+        console.log(err);
+        this.isUpdating = false;
+        this.isError = true;
       }
-      this.isUpdated = true;
-      this.isUpdating = false;
     },
 
-    getIntervalId(sheetNumber){
+    getIntervalId(sheetNumber) {
       var columnNames = Object.keys(this.selectedDaySheet[sheetNumber]);
-      var columnIdArray
-
+      var columnIdArray;
     },
     async uploadIntervalForecastsExcel(dataArray) {
       return upsertIntervalForecast(dataArray);
@@ -527,7 +545,7 @@ export default {
 
       return [year, month, day].join("-");
     },
-    excelDateToDateNumber(dateString){
+    excelDateToDateNumber(dateString) {
       let splitDate = dateString.split(".");
       let day = splitDate[0];
       let month = splitDate[1];
@@ -552,19 +570,23 @@ export default {
       });
     },
     fetchAllForecastIntervals() {
-      GetIntervalMapper().then(res=>{
+      GetIntervalMapper().then(res => {
         this.intervals = res.data;
         for (var i = 0; i < this.intervals.length; i++) {
           this.intervalHash[this.intervals[i].id] = this.intervals[i];
-          this.intervalHashReverse[this.intervals[i].name] = this.intervals[i].id;
+          this.intervalHashReverse[this.intervals[i].name] = this.intervals[
+            i
+          ].id;
         }
-      })
+      });
     },
     fetchAllOutlooks() {
       GetOutlookMapper().then(res => {
         this.outlooks = res.data;
         for (var i = 0; i < this.outlooks.length; i++) {
           this.outlookHash[this.outlooks[i].id] = this.outlooks[i];
+          var name = this.outlooks[i].name.toLowerCase().replace(/\s/g,'');
+          this.outlookHashReverse[name] = this.outlooks[i];
         }
       });
     },
@@ -634,7 +656,7 @@ export default {
             intervalId: interval.id,
             outlookId: this.outlooks[0].id,
             dateNumber: this.selectedStation.weather[0].dateNumber,
-            stationId: this.selectedStation.id,
+            stationId: this.selectedStation.id
           };
           this.intervalForecastData.push(data);
         });
