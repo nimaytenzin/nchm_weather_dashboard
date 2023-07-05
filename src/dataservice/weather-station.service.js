@@ -24,6 +24,16 @@ export async function UpdateWeatherStation(id, data) {
   });
 }
 
-export async function GetWeatherTodayByStation(stationName) {
-  return await axios.get(`${BackendApi}/station/weather/${stationName}`);
+export async function GetWeatherNowByStation(stationName) {
+  return await axios.get(
+    `${BackendApi}/interval-forecast/station/${stationName}`
+  );
+}
+
+//bhutanweatherapp.nchm.gov.bt/api/medium-range-forecast/station/
+
+export async function GetMediumRangeForecastByStation(stationName) {
+  return await axios.get(
+    `${BackendApi}medium-range-forecast/station/${stationName}`
+  );
 }

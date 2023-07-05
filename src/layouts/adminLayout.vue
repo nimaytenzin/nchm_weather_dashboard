@@ -11,6 +11,7 @@
 
       <div id="menu" class="flex flex-col space-y-2">
         <router-link
+          v-if="isAdmin"
           to="/admin"
           class="flex items-end gap-2 text-sm text-gray-700 py-2 px-10 transition duration-150 ease-in-out"
           @click="selectTab('dashboard')"
@@ -32,7 +33,7 @@
           </svg>
           <p class>Dashboard</p>
         </router-link>
-        <router-link
+        <!-- <router-link
           v-if="isAdmin"
           to="/admin/parameters/"
           class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
@@ -54,7 +55,7 @@
             />
           </svg>
           <span class>Parameters</span>
-        </router-link>
+        </router-link> -->
         <router-link
           v-if="isAdmin"
           to="/admin/api/"
@@ -106,7 +107,8 @@
           <span class="">Outlooks</span>
         </router-link>-->
 
-        <router-link
+        <!-- <router-link
+          v-if="isAdmin"
           to="/admin/weather/"
           class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
           @click="selectTab('weather')"
@@ -132,8 +134,37 @@
           </svg>
 
           <span class>Weather Forecast</span>
+        </router-link> -->
+        <router-link
+          v-if="isAdmin"
+          to="/admin/advisories/"
+          class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
+          @click="selectTab('advisory')"
+          :class="
+            selectedTab === 'advisory'
+              ? 'bg-primary text-primary-textOnPrimary '
+              : 'text-primary-heading1'
+          "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z"
+            />
+          </svg>
+
+          <span class>Weather Advisories</span>
         </router-link>
         <router-link
+          v-if="isAdmin"
           to="/"
           class="flex gap-2 items-end px-10 text-sm py-2 transition duration-150 ease-in-out"
           @click="selectTab('logout')"
@@ -228,7 +259,7 @@ import VueJwtDecode from "vue-jwt-decode";
 export default {
   data: () => ({
     selectedTab: "dashboard",
-    isAdmin: false
+    isAdmin: false,
   }),
   created() {
     if (sessionStorage.getItem("token") !== "") {
@@ -242,7 +273,7 @@ export default {
     selectTab(tabName) {
       console.log(tabName, "Selected");
       this.selectedTab = tabName;
-    }
-  }
+    },
+  },
 };
 </script>

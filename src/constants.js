@@ -2,7 +2,6 @@
 // export const BackendApi = "https://nchm.ddnsfree.com/api";
 export const BackendApi = import.meta.env.VITE_API_ENDPOINT;
 
-
 export const TimeRange = [
   {
     name: "12am",
