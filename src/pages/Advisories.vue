@@ -189,7 +189,7 @@ export default {
     },
 
     parseUri(url) {
-      return "http://localhost:3000/" + url;
+      return "https://bhutanweatherapp.nchm.gov.bt/api/" + url;
     },
 
     handleFileChange(event) {
@@ -220,15 +220,13 @@ export default {
     },
 
     formatDate(date) {
-      var d = new Date(date),
-        month = "" + (d.getMonth() + 1),
-        day = "" + d.getDate(),
-        year = d.getFullYear();
-
-      if (month.length < 2) month = "0" + month;
-      if (day.length < 2) day = "0" + day;
-
-      return [year, month, day].join("");
+      var d = new Date(date);
+      return d.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long",
+      });
     },
   },
 };
