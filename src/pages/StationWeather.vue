@@ -164,7 +164,7 @@
 import { Switch } from "@headlessui/vue";
 import { toDzongkha } from "../dataservice/dzongkhalang.service";
 import { GetDailyForecastForAllStationsByDate } from "../dataservice/daily-forecast.service";
-import { GetWeatherTodayByStation } from "../dataservice/weather-station.service";
+import { GetWeatherTodayByStation, GetWeatherNowByStation } from "../dataservice/weather-station.service";
 import { BackendApi, TimeRange } from "../constants";
 
 export default {
@@ -188,7 +188,7 @@ export default {
       return toDzongkha(number);
     },
     fetchDailyForecasts() {
-      GetWeatherTodayByStation(this.stationName).then((res) => {
+      GetWeatherNowByStation(this.stationName).then((res) => {
         this.stationWeather = res.data;
       });
     },
