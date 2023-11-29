@@ -11,6 +11,10 @@ const router = createRouter({
       component: LoginPage,
     },
     {
+      path: "/privacy",
+      component: () => import("../pages/privacy.vue")
+    },
+    {
       path: "/admin/",
       component: () => import("../layouts/adminLayout.vue"),
       children: [
