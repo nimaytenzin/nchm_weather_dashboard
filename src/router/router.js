@@ -11,7 +11,7 @@ const router = createRouter({
       component: LoginPage,
     },
     {
-      path: "/privacy",
+      path: "/privacy/",
       component: () => import("../pages/privacy.vue")
     },
     {
